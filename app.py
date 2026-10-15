@@ -449,7 +449,7 @@ st.sidebar.markdown("## ⚙️ Configuración Personal")
 
 cfg_usuario = cargar_config_usuario()
 
-tab_sb_el, tab_sb_ella, tab_sb_act = st.sidebar.tabs(["👨 Perfil Él", "👩 Perfil Ella", "⚙️ Cardio & Olla"])
+tab_sb_el, tab_sb_ella = st.sidebar.tabs(["👨 Perfil: Él", "👩 Perfil: Ella"])
 
 with tab_sb_el:
     col_el1, col_el2 = st.columns(2)
@@ -467,24 +467,20 @@ with tab_sb_ella:
         altura_ella = st.number_input("Altura (cm)", min_value=120, max_value=200, value=int(cfg_usuario.get("altura_ella", 150)), step=1, key="altura_ella")
     edad_ella = st.number_input("Edad (años)", min_value=18, max_value=99, value=int(cfg_usuario.get("edad_ella", 33)), step=1, key="edad_ella")
 
-with tab_sb_act:
-    st.markdown("### 🚶 Actividad Semanal (Caminatas)")
-    horas_sem = st.slider("Horas de caminata por semana", min_value=0.0, max_value=14.0, value=float(cfg_usuario.get("horas_sem", 3.0)), step=0.5,
-                          help="Ejemplo: 3 horas semanales = Lunes, Jueves y Viernes 1h c/u.")
-    intensidad_mets_dict = {
-        "4.0 METs - Caminata paso constante/ligero (4.8 - 5.0 km/h)": 4.0,
-        "3.0 METs - Caminata suave (4.0 km/h)": 3.0,
-        "4.8 METs - Caminata rápida (5.5 - 6.0 km/h)": 4.8
-    }
-    idx_mets = list(intensidad_mets_dict.keys()).index(cfg_usuario.get("opcion_mets")) if cfg_usuario.get("opcion_mets") in intensidad_mets_dict else 0
-    opcion_mets = st.selectbox("Intensidad (METs)", list(intensidad_mets_dict.keys()), index=idx_mets)
-    mets_val = intensidad_mets_dict[opcion_mets]
+# Configuración de Actividad Semanal e Intensidad
+intensidad_mets_dict = {
+    "4.0 METs - Caminata paso constante/ligero (4.8 - 5.0 km/h)": 4.0,
+    "3.0 METs - Caminata suave (4.0 km/h)": 3.0,
+    "4.8 METs - Caminata rápida (5.5 - 6.0 km/h)": 4.8
+}
+opcion_mets = st.session_state.get("sim_opcion_mets", cfg_usuario.get("opcion_mets", "4.0 METs - Caminata paso constante/ligero (4.8 - 5.0 km/h)"))
+if opcion_mets not in intensidad_mets_dict:
+    opcion_mets = "4.0 METs - Caminata paso constante/ligero (4.8 - 5.0 km/h)"
+mets_val = intensidad_mets_dict[opcion_mets]
+horas_sem = float(st.session_state.get("sim_horas_sem", cfg_usuario.get("horas_sem", 3.0)))
 
-    st.markdown("---")
-    st.markdown("### 🍲 Reparto de la Olla Compartida")
-    lista_reparto = ["Dinámica según Metas Calóricas", "Fija Estándar (60% Él / 40% Ella)"]
-    idx_reparto = lista_reparto.index(cfg_usuario.get("tipo_reparto")) if cfg_usuario.get("tipo_reparto") in lista_reparto else 0
-    tipo_reparto = st.radio("Proporción de Olla Compartida", lista_reparto, index=idx_reparto)
+# Criterio de reparto de la Olla Compartida
+tipo_reparto = st.session_state.get("tipo_reparto_val", cfg_usuario.get("tipo_reparto", "Dinámica según Metas Calóricas"))
 
 # CÁLCULOS METABÓLICOS BASE (MIFFLIN-ST JEOR & TDEE)
 tmb_el = (10.0 * peso_el) + (6.25 * altura_el) - (5.0 * edad_el) + 5.0
@@ -936,6 +932,33 @@ with tab1:
     # --- SECCIÓN 2: ARMADOR DE COMIDA / OLLA COMPARTIDA ---
     st.markdown("### 2. Armador de Comida / Olla Compartida")
     st.markdown("Construye una receta ingrediente por ingrediente o carga una receta guardada de tu recetario permanente.")
+
+    # Criterio de Reparto de la Olla Compartida
+    with st.container():
+        st.markdown("""
+        <div style="background: rgba(30, 41, 59, 0.55); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px;">
+            <span style="font-weight: 700; color: #38bdf8; font-size: 0.92rem;">⚖️ CRITERIO DE REPARTO DE LA OLLA:</span>
+            <div style="font-size: 0.8rem; color: #94a3b8; margin-top: 2px;">
+                Elige cómo dividir las porciones cocidas de la olla entre ambos:
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        lista_reparto_tab1 = ["Dinámica según Metas Calóricas", "Fija Estándar (60% Él / 40% Ella)"]
+        idx_reparto_tab1 = lista_reparto_tab1.index(tipo_reparto) if tipo_reparto in lista_reparto_tab1 else 0
+        tipo_reparto_sel = st.radio(
+            "Criterio de Reparto:",
+            lista_reparto_tab1,
+            index=idx_reparto_tab1,
+            horizontal=True,
+            key="tipo_reparto_val",
+            help="Dinámica: Reparte según las calorías objetivo de cada uno. Fija: Siempre 60% para Él y 40% para Ella."
+        )
+        c_inf_r1, c_inf_r2 = st.columns(2)
+        with c_inf_r1:
+            st.markdown(f"<span style='color: #60a5fa; font-weight: 600; font-size: 0.88rem;'>👨 Porción Él: <b>{prop_el*100:.1f}%</b> del total cocido</span>", unsafe_allow_html=True)
+        with c_inf_r2:
+            st.markdown(f"<span style='color: #f472b6; font-weight: 600; font-size: 0.88rem;'>👩 Porción Ella: <b>{prop_ella*100:.1f}%</b> del total cocido</span>", unsafe_allow_html=True)
+
 
     # PANEL DE RECETAS FAVORITAS (GUARDAR Y CARGAR)
     with st.expander("📖 Recetario Permanente: Cargar o Guardar Recetas", expanded=True):
@@ -1529,6 +1552,57 @@ with tab_sem:
                 else:
                     st.caption("No hay comidas registradas para este día aún.")
 
+                # ==============================================================
+                # MONITOR DE MACRONUTRIENTES DIARIOS (P, C, G): DÉFICIT / EXCESO
+                # ==============================================================
+                tot_dia_el_p = sum(c.get("el_p", 0.0) for c in comidas_dia)
+                tot_dia_el_c = sum(c.get("el_c", 0.0) for c in comidas_dia)
+                tot_dia_el_g = sum(c.get("el_g", 0.0) for c in comidas_dia)
+
+                tot_dia_ella_p = sum(c.get("ella_p", 0.0) for c in comidas_dia)
+                tot_dia_ella_c = sum(c.get("ella_c", 0.0) for c in comidas_dia)
+                tot_dia_ella_g = sum(c.get("ella_g", 0.0) for c in comidas_dia)
+
+                st.markdown("---")
+                st.markdown(f"###### 🎯 Cumplimiento de Macros ({dia_nom})")
+                st.caption("Compara lo consumido hoy contra la meta diaria asignada. Indica si faltan gramos (déficit) o si se superó la meta (exceso).")
+
+                tab_m_el, tab_m_ella = st.tabs(["👨 Macros Él", "👩 Macros Ella"])
+
+                def render_card_macro(nom_macro, val_consumido, val_meta, color_val, class_badge):
+                    diff_m = val_consumido - val_meta
+                    pct_m = min(1.0, max(0.0, val_consumido / val_meta)) if val_meta > 0 else 0.0
+                    if diff_m < -4.0:
+                        badge_txt = f"<span style='background:rgba(59,130,246,0.18); color:#60a5fa; border:1px solid rgba(59,130,246,0.35); padding:2px 8px; border-radius:6px; font-size:0.78rem; font-weight:700;'>⏳ Faltan {abs(diff_m):.1f}g (Déficit)</span>"
+                    elif diff_m > 4.0:
+                        badge_txt = f"<span style='background:rgba(239,68,68,0.18); color:#f87171; border:1px solid rgba(239,68,68,0.35); padding:2px 8px; border-radius:6px; font-size:0.78rem; font-weight:700;'>⚠️ Pasado +{diff_m:.1f}g (Exceso)</span>"
+                    else:
+                        badge_txt = "<span style='background:rgba(16,185,129,0.18); color:#34d399; border:1px solid rgba(16,185,129,0.35); padding:2px 8px; border-radius:6px; font-size:0.78rem; font-weight:700;'>✅ En la meta exacto</span>"
+
+                    st.markdown(f"""
+                    <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 8px 12px; margin-bottom: 6px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                            <span class="{class_badge}"><b>{nom_macro}</b></span>
+                            <div>{badge_txt}</div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.82rem; color: #cbd5e1;">
+                            <span>Consumido: <b style="color:{color_val};">{val_consumido:.1f}g</b></span>
+                            <span>Meta: <b>{val_meta:.0f}g</b> ({pct_m*100:.0f}%)</span>
+                        </div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    st.progress(pct_m)
+
+                with tab_m_el:
+                    render_card_macro("Proteína", tot_dia_el_p, req_p_el, "#60a5fa", "badge-p")
+                    render_card_macro("Carbohidratos", tot_dia_el_c, req_c_el, "#34d399", "badge-c")
+                    render_card_macro("Grasas", tot_dia_el_g, req_g_el, "#fbbf24", "badge-g")
+
+                with tab_m_ella:
+                    render_card_macro("Proteína", tot_dia_ella_p, req_p_ella, "#f472b6", "badge-p")
+                    render_card_macro("Carbohidratos", tot_dia_ella_c, req_c_ella, "#34d399", "badge-c")
+                    render_card_macro("Grasas", tot_dia_ella_g, req_g_ella, "#fbbf24", "badge-g")
+
             # ==============================================================
             # COLUMNA DERECHA: ACTIVIDADES & RELOJ INTELIGENTE
             # ==============================================================
@@ -1832,47 +1906,138 @@ with tab2:
     st.markdown("### 🔥 Auditoría Metabólica y Gasto Energético Comparado")
     st.markdown("Cálculos científicos basados en Mifflin-St Jeor y equivalentes metabólicos (METs) precisos.")
 
+    # ==============================================================
+    # SELECTOR DE MODO DE AUDITORÍA & SIMULADOR "¿QUÉ PASARÍA SI...?"
+    # ==============================================================
+    col_mod_info, col_mod_ctrl = st.columns([1.2, 1.8])
+    with col_mod_info:
+        st.markdown("""
+        <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 12px 16px;">
+            <strong style="color: #38bdf8; font-size: 0.95rem;">🧭 Modo de Auditoría & Proyección:</strong>
+            <p style="color: #94a3b8; font-size: 0.8rem; margin: 4px 0 0 0;">
+                Elige si proyectar según tu <b>actividad real registrada</b> en la semana o si deseas usar el <b>simulador teórico</b> interactivo con slider.
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+    with col_mod_ctrl:
+        modo_auditoria = st.radio(
+            "Modelo de Cálculo:",
+            [
+                "🏃‍♂️ Usar Actividad Real Registrada en la Semana",
+                "🔮 Simulador Teórico ('¿Qué pasaría si...?')"
+            ],
+            index=0 if st.session_state.get("modo_aud_state", "Real") == "Real" else 1,
+            key="sel_modo_auditoria",
+            horizontal=False
+        )
+
+    # Cálculo de horas y METs según el modo elegido
+    if "Simulador" in modo_auditoria:
+        st.session_state.modo_aud_state = "Simulador"
+        with st.container():
+            st.markdown("""
+            <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 10px; padding: 12px 16px; margin-bottom: 14px;">
+                <strong style="color: #60a5fa; font-size: 0.9rem;">🔮 Simulador Teórico Activo</strong>
+                <span style="color: #cbd5e1; font-size: 0.8rem; display: block; margin-top: 2px;">
+                    Mueve el slider para explorar: "¿Cuántos kilos bajo en 6 meses si camino X horas por semana?":
+                </span>
+            </div>
+            """, unsafe_allow_html=True)
+            col_sim_h, col_sim_m = st.columns([1.5, 1.5])
+            with col_sim_h:
+                sim_h = st.slider(
+                    "Horas de caminata semanales a simular:",
+                    min_value=0.0, max_value=14.0,
+                    value=float(st.session_state.get("sim_horas_sem", cfg_usuario.get("horas_sem", 3.0))),
+                    step=0.5,
+                    key="slider_sim_h_tab2"
+                )
+                st.session_state.sim_horas_sem = sim_h
+            with col_sim_m:
+                idx_m_sim = list(intensidad_mets_dict.keys()).index(opcion_mets) if opcion_mets in intensidad_mets_dict else 0
+                sim_m_opc = st.selectbox(
+                    "Intensidad de la caminata (METs):",
+                    list(intensidad_mets_dict.keys()),
+                    index=idx_m_sim,
+                    key="sel_sim_mets_tab2"
+                )
+                st.session_state.sim_opcion_mets = sim_m_opc
+                sim_mets_val = intensidad_mets_dict[sim_m_opc]
+
+            h_aud_el = sim_h
+            h_aud_ella = sim_h
+            mets_aud = sim_mets_val
+    else:
+        st.session_state.modo_aud_state = "Real"
+        # Usar la suma de horas reales registradas en la semana actual
+        min_tot_el = sum(sum(int(a.get("minutos", 0)) for a in st.session_state.semana_caminatas.get(d, {}).get("actividades_el", [])) for d in DIAS_SEMANA)
+        min_tot_ella = sum(sum(int(a.get("minutos", 0)) for a in st.session_state.semana_caminatas.get(d, {}).get("actividades_ella", [])) for d in DIAS_SEMANA)
+        h_aud_el = round(min_tot_el / 60.0, 2)
+        h_aud_ella = round(min_tot_ella / 60.0, 2)
+        mets_aud = mets_val
+
+        st.info(
+            f"📊 **Actividad Real Detectada esta semana:** "
+            f"👨 Él: **{h_aud_el:.1f} horas** registradas | 👩 Ella: **{h_aud_ella:.1f} horas** registradas. "
+            f"(Para proyectar otros escenarios con slider manual, activa '🔮 Simulador Teórico' arriba)."
+        )
+
+    # Recálculo de Auditoría
+    quema_1h_aud_el = mets_aud * peso_el * 1.0
+    techo_cam_aud_el = sed_el + quema_1h_aud_el
+    tdee_prom_aud_el = sed_el + ((quema_1h_aud_el * h_aud_el) / 7.0)
+    deficit_aud_el = tdee_prom_aud_el - meta_kcal_el
+    kg_sem_aud_el = abs(deficit_aud_el * 7.0) / 7700.0
+    kg_mes_aud_el = abs(deficit_aud_el * 30.4) / 7700.0
+
+    quema_1h_aud_ella = mets_aud * peso_ella * 1.0
+    techo_cam_aud_ella = sed_ella + quema_1h_aud_ella
+    tdee_prom_aud_ella = sed_ella + ((quema_1h_aud_ella * h_aud_ella) / 7.0)
+    deficit_aud_ella = tdee_prom_aud_ella - meta_kcal_ella
+    kg_sem_aud_ella = abs(deficit_aud_ella * 7.0) / 7700.0
+    kg_mes_aud_ella = abs(deficit_aud_ella * 30.4) / 7700.0
+
     col_aud_he, col_aud_she = st.columns(2)
     
     with col_aud_he:
         st.markdown("""
         <div style="background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.25); border-radius: 12px; padding: 18px; margin-bottom: 20px;">
             <h3 style="color: #60a5fa; margin-top: 0;">👨 Auditoría Metabólica: Él</h3>
-            <p style="color: #94a3b8; font-size: 0.88rem;">Estatura: 180 cm | Peso: %.1f kg | Edad: %d años</p>
+            <p style="color: #94a3b8; font-size: 0.88rem;">Estatura: 180 cm | Peso: %.1f kg | Edad: %d años | Actividad: %.1fh/sem</p>
         </div>
-        """ % (peso_el, edad_el), unsafe_allow_html=True)
+        """ % (peso_el, edad_el, h_aud_el), unsafe_allow_html=True)
         
         m_c1, m_c2 = st.columns(2)
         with m_c1:
             st.metric("Piso Vital (TMB)", f"{tmb_el:.0f} kcal", help="Mifflin-St Jeor: Calorías mínimas para subsistir en reposo absoluto.")
             st.metric("Gasto Base (Día Descanso)", f"{sed_el:.0f} kcal", help="TMB * 1.2: Calorías que quemas un día que te quedas en casa y no sales a caminar.")
-            st.metric("TDEE Promedio Semanal", f"{tdee_prom_el:.0f} kcal", help="Gasto promedio diario incluyendo tus horas de caminata.")
+            st.metric("TDEE Promedio Semanal", f"{tdee_prom_aud_el:.0f} kcal", help=f"Gasto promedio diario considerando {h_aud_el:.1f}h de ejercicio semanal.")
         with m_c2:
-            st.metric("Quema 1h Caminata", f"{quema_1h_el:.0f} kcal", f"{mets_val} METs x {peso_el:.0f}kg", help="Fórmula: METs * Peso * 1h")
-            st.metric("Gasto Día con Caminata (1h)", f"{techo_cam_el:.0f} kcal", help="Gasto Base + 1 hora de caminata.")
+            st.metric("Quema 1h Caminata", f"{quema_1h_aud_el:.0f} kcal", f"{mets_aud} METs x {peso_el:.0f}kg", help="Fórmula: METs * Peso * 1h")
+            st.metric("Gasto Día con Caminata (1h)", f"{techo_cam_aud_el:.0f} kcal", help="Gasto Base + 1 hora de caminata.")
             st.metric(
                 "Meta Calórica Asignada",
                 f"{meta_kcal_el:.0f} kcal",
                 help="🎯 Meta Calórica Asignada: Es tu presupuesto diario de comida. Está por encima de tu Piso Vital (TMB) para cuidar tu tiroides y masa muscular, y por debajo de tu Gasto (TDEE) para forzar la quema de grasa."
             )
-        if deficit_el >= 15:
+        if deficit_aud_el >= 15:
             card_title_el = "📉 Déficit Calórico Neto Diario"
-            card_val_el = f"-{deficit_el:.0f} kcal / día"
-            card_sub_el = f"Pérdida estimada de grasa (a 7700 kcal/kg):<br><b>📉 -{kg_sem_el:.2f} kg / semana</b> &nbsp;|&nbsp; <b>📅 -{kg_mes_el:.2f} kg / mes</b>"
+            card_val_el = f"-{deficit_aud_el:.0f} kcal / día"
+            card_sub_el = f"Pérdida estimada de grasa (a 7700 kcal/kg):<br><b>📉 -{kg_sem_aud_el:.2f} kg / semana</b> &nbsp;|&nbsp; <b>📅 -{kg_mes_aud_el:.2f} kg / mes</b>"
             border_color_el = "#10b981"
-            badge_note_el = f"💡 <b>¿Qué significa?</b> Comes <b>-{deficit_el:.0f} kcal/día</b> por debajo de tu gasto ({tdee_prom_el:.0f} kcal). Generas déficit para quemar reservas de grasa corporal."
-        elif deficit_el <= -15:
+            badge_note_el = f"💡 <b>¿Qué significa?</b> Comes <b>-{deficit_aud_el:.0f} kcal/día</b> por debajo de tu gasto ({tdee_prom_aud_el:.0f} kcal). Generas déficit para quemar reservas de grasa corporal."
+        elif deficit_aud_el <= -15:
             card_title_el = "📈 Superávit Calórico Neto Diario"
-            card_val_el = f"+{abs(deficit_el):.0f} kcal / día"
-            card_sub_el = f"Ganancia estimada de masa / peso:<br><b>📈 +{kg_sem_el:.2f} kg / semana</b> &nbsp;|&nbsp; <b>📅 +{kg_mes_el:.2f} kg / mes</b>"
+            card_val_el = f"+{abs(deficit_aud_el):.0f} kcal / día"
+            card_sub_el = f"Ganancia estimada de masa / peso:<br><b>📈 +{kg_sem_aud_el:.2f} kg / semana</b> &nbsp;|&nbsp; <b>📅 +{kg_mes_aud_el:.2f} kg / mes</b>"
             border_color_el = "#3b82f6"
-            badge_note_el = f"💡 <b>¿Qué significa?</b> Comes <b>+{abs(deficit_el):.0f} kcal/día</b> por encima de tu gasto ({tdee_prom_el:.0f} kcal). Estás en superávit para ganar peso / masa muscular."
+            badge_note_el = f"💡 <b>¿Qué significa?</b> Comes <b>+{abs(deficit_aud_el):.0f} kcal/día</b> por encima de tu gasto ({tdee_prom_aud_el:.0f} kcal). Estás en superávit para ganar peso / masa muscular."
         else:
             card_title_el = "⚖️ Mantenimiento Calórico Diario"
             card_val_el = "Equilibrado (0 kcal)"
             card_sub_el = "Consumo equilibrado con tu gasto diario. Tu peso se mantendrá estable."
             border_color_el = "#94a3b8"
-            badge_note_el = f"💡 <b>¿Qué significa?</b> Comes exactamente lo que gastas ({tdee_prom_el:.0f} kcal). Tu peso se mantendrá sin variaciones."
+            badge_note_el = f"💡 <b>¿Qué significa?</b> Comes exactamente lo que gastas ({tdee_prom_aud_el:.0f} kcal). Tu peso se mantendrá sin variaciones."
 
         st.markdown(f"""
         <div style="font-size: 0.77rem; color: #cbd5e1; background: rgba(59, 130, 246, 0.12); border-left: 3px solid #3b82f6; padding: 4px 8px; border-radius: 4px; margin-top: -6px; margin-bottom: 8px;">
@@ -1894,42 +2059,42 @@ with tab2:
         st.markdown("""
         <div style="background: rgba(236, 72, 153, 0.08); border: 1px solid rgba(236, 72, 153, 0.25); border-radius: 12px; padding: 18px; margin-bottom: 20px;">
             <h3 style="color: #f472b6; margin-top: 0;">👩 Auditoría Metabólica: Ella</h3>
-            <p style="color: #94a3b8; font-size: 0.88rem;">Estatura: 150 cm | Peso: %.1f kg | Edad: %d años</p>
+            <p style="color: #94a3b8; font-size: 0.88rem;">Estatura: 150 cm | Peso: %.1f kg | Edad: %d años | Actividad: %.1fh/sem</p>
         </div>
-        """ % (peso_ella, edad_ella), unsafe_allow_html=True)
+        """ % (peso_ella, edad_ella, h_aud_ella), unsafe_allow_html=True)
         
         m_c3, m_c4 = st.columns(2)
         with m_c3:
             st.metric("Piso Vital (TMB)", f"{tmb_ella:.0f} kcal", help="Mifflin-St Jeor: Gasto mínimo para funciones vitales.")
             st.metric("Gasto Base (Día Descanso)", f"{sed_ella:.0f} kcal", help="TMB * 1.2: Calorías que quemas un día que te quedas en casa y no sales a caminar.")
-            st.metric("TDEE Promedio Semanal", f"{tdee_prom_ella:.0f} kcal", help="Gasto promedio diario incluyendo tus horas de caminata.")
+            st.metric("TDEE Promedio Semanal", f"{tdee_prom_aud_ella:.0f} kcal", help=f"Gasto promedio diario considerando {h_aud_ella:.1f}h de ejercicio semanal.")
         with m_c4:
-            st.metric("Quema 1h Caminata", f"{quema_1h_ella:.0f} kcal", f"{mets_val} METs x {peso_ella:.0f}kg", help="Fórmula: METs * Peso * 1h")
-            st.metric("Gasto Día con Caminata (1h)", f"{techo_cam_ella:.0f} kcal", help="Gasto Base + 1 hora de caminata.")
+            st.metric("Quema 1h Caminata", f"{quema_1h_aud_ella:.0f} kcal", f"{mets_aud} METs x {peso_ella:.0f}kg", help="Fórmula: METs * Peso * 1h")
+            st.metric("Gasto Día con Caminata (1h)", f"{techo_cam_aud_ella:.0f} kcal", help="Gasto Base + 1 hora de caminata.")
             st.metric(
                 "Meta Calórica Asignada",
                 f"{meta_kcal_ella:.0f} kcal",
                 help="🎯 Meta Calórica Asignada: Es tu presupuesto diario de comida. Puede ser déficit para bajar de peso o superávit para ganar masa muscular."
             )
 
-        if deficit_ella >= 15:
+        if deficit_aud_ella >= 15:
             card_title_ella = "📉 Déficit Calórico Neto Diario"
-            card_val_ella = f"-{deficit_ella:.0f} kcal / día"
-            card_sub_ella = f"Pérdida estimada de grasa (a 7700 kcal/kg):<br><b>📉 -{kg_sem_ella:.2f} kg / semana</b> &nbsp;|&nbsp; <b>📅 -{kg_mes_ella:.2f} kg / mes</b>"
+            card_val_ella = f"-{deficit_aud_ella:.0f} kcal / día"
+            card_sub_ella = f"Pérdida estimada de grasa (a 7700 kcal/kg):<br><b>📉 -{kg_sem_aud_ella:.2f} kg / semana</b> &nbsp;|&nbsp; <b>📅 -{kg_mes_aud_ella:.2f} kg / mes</b>"
             border_color_ella = "#10b981"
-            badge_note_ella = f"💡 <b>¿Qué significa?</b> Comes <b>-{deficit_ella:.0f} kcal/día</b> por debajo de tu gasto ({tdee_prom_ella:.0f} kcal). Generas déficit para quemar reservas de grasa corporal."
-        elif deficit_ella <= -15:
+            badge_note_ella = f"💡 <b>¿Qué significa?</b> Comes <b>-{deficit_aud_ella:.0f} kcal/día</b> por debajo de tu gasto ({tdee_prom_aud_ella:.0f} kcal). Generas déficit para quemar reservas de grasa corporal."
+        elif deficit_aud_ella <= -15:
             card_title_ella = "📈 Superávit Calórico Neto Diario"
-            card_val_ella = f"+{abs(deficit_ella):.0f} kcal / día"
-            card_sub_ella = f"Ganancia estimada de masa / peso:<br><b>📈 +{kg_sem_ella:.2f} kg / semana</b> &nbsp;|&nbsp; <b>📅 +{kg_mes_ella:.2f} kg / mes</b>"
+            card_val_ella = f"+{abs(deficit_aud_ella):.0f} kcal / día"
+            card_sub_ella = f"Ganancia estimada de masa / peso:<br><b>📈 +{kg_sem_aud_ella:.2f} kg / semana</b> &nbsp;|&nbsp; <b>📅 +{kg_mes_aud_ella:.2f} kg / mes</b>"
             border_color_ella = "#ec4899"
-            badge_note_ella = f"💡 <b>¿Qué significa?</b> Comes <b>+{abs(deficit_ella):.0f} kcal/día</b> por encima de tu gasto ({tdee_prom_ella:.0f} kcal). Estás en superávit para ganar peso / masa muscular."
+            badge_note_ella = f"💡 <b>¿Qué significa?</b> Comes <b>+{abs(deficit_aud_ella):.0f} kcal/día</b> por encima de tu gasto ({tdee_prom_aud_ella:.0f} kcal). Estás en superávit para ganar peso / masa muscular."
         else:
             card_title_ella = "⚖️ Mantenimiento Calórico Diario"
             card_val_ella = "Equilibrado (0 kcal)"
             card_sub_ella = "Consumo equilibrado con tu gasto diario. Tu peso se mantendrá estable."
             border_color_ella = "#94a3b8"
-            badge_note_ella = f"💡 <b>¿Qué significa?</b> Comes exactamente lo que gastas ({tdee_prom_ella:.0f} kcal). Tu peso se mantendrá sin variaciones."
+            badge_note_ella = f"💡 <b>¿Qué significa?</b> Comes exactamente lo que gastas ({tdee_prom_aud_ella:.0f} kcal). Tu peso se mantendrá sin variaciones."
 
         st.markdown(f"""
         <div style="font-size: 0.77rem; color: #cbd5e1; background: rgba(236, 72, 153, 0.12); border-left: 3px solid #ec4899; padding: 4px 8px; border-radius: 4px; margin-top: -6px; margin-bottom: 8px;">
@@ -1953,8 +2118,8 @@ with tab2:
     st.markdown("#### 1. Comparación de Umbrales Energéticos (Él vs. Ella)")
     
     categorias_umbrales = ["Piso Vital (TMB)", "Consumo del Plan", "Techo Sedentario", "Gasto Promedio (TDEE)", "Techo Día Caminata"]
-    valores_el = [tmb_el, meta_kcal_el, sed_el, tdee_prom_el, techo_cam_el]
-    valores_ella = [tmb_ella, meta_kcal_ella, sed_ella, tdee_prom_ella, techo_cam_ella]
+    valores_el = [tmb_el, meta_kcal_el, sed_el, tdee_prom_aud_el, techo_cam_aud_el]
+    valores_ella = [tmb_ella, meta_kcal_ella, sed_ella, tdee_prom_aud_ella, techo_cam_aud_ella]
     
     fig_umbrales = go.Figure()
     fig_umbrales.add_trace(go.Bar(
@@ -1990,15 +2155,15 @@ with tab2:
     # GRÁFICO 2: PROYECCIÓN DINÁMICA A 24 SEMANAS RECALCULANDO TMB
     st.markdown("#### 2. Curva de Proyección Dinámica a 24 Semanas (6 Meses)")
     st.markdown(
-        "*Simulación adaptativa:* Modela semana a semana tanto el déficit (pérdida de peso) como el superávit (ganancia de masa/peso), "
-        "recalculando el nuevo TMB y gasto físico con el peso actualizado."
+        f"*Simulación adaptativa ({'Modo Simulador Teórico' if 'Simulador' in modo_auditoria else 'Modo Actividad Real'}):* "
+        f"Modela semana a semana la evolución corporal recalculando TMB y gasto físico dinámicamente con el peso actualizado."
     )
     
     semanas = list(range(0, 25))
     proy_peso_el = [peso_el]
     proy_peso_ella = [peso_ella]
-    proy_deficit_el = [deficit_el]
-    proy_deficit_ella = [deficit_ella]
+    proy_deficit_el = [deficit_aud_el]
+    proy_deficit_ella = [deficit_aud_ella]
 
     curr_p_el = peso_el
     curr_p_ella = peso_ella
@@ -2007,8 +2172,8 @@ with tab2:
         # Recalcular Él
         tmb_s_el = (10.0 * curr_p_el) + (6.25 * altura_el) - (5.0 * edad_el) + 5.0
         sed_s_el = tmb_s_el * 1.2
-        q1h_s_el = mets_val * curr_p_el * 1.0
-        tdee_s_el = sed_s_el + ((q1h_s_el * horas_sem) / 7.0)
+        q1h_s_el = mets_aud * curr_p_el * 1.0
+        tdee_s_el = sed_s_el + ((q1h_s_el * h_aud_el) / 7.0)
         def_s_el = tdee_s_el - meta_kcal_el
         var_sem_el = (def_s_el * 7.0) / 7700.0
         curr_p_el = max(45.0, min(220.0, curr_p_el - var_sem_el))
@@ -2018,8 +2183,8 @@ with tab2:
         # Recalcular Ella
         tmb_s_ella = (10.0 * curr_p_ella) + (6.25 * altura_ella) - (5.0 * edad_ella) - 161.0
         sed_s_ella = tmb_s_ella * 1.2
-        q1h_s_ella = mets_val * curr_p_ella * 1.0
-        tdee_s_ella = sed_s_ella + ((q1h_s_ella * horas_sem) / 7.0)
+        q1h_s_ella = mets_aud * curr_p_ella * 1.0
+        tdee_s_ella = sed_s_ella + ((q1h_s_ella * h_aud_ella) / 7.0)
         def_s_ella = tdee_s_ella - meta_kcal_ella
         var_sem_ella = (def_s_ella * 7.0) / 7700.0
         curr_p_ella = max(35.0, min(160.0, curr_p_ella - var_sem_ella))
@@ -2058,7 +2223,7 @@ with tab2:
 
     fig_proy.update_layout(
         template="plotly_dark",
-        title="Trayectoria Proyectada de Peso a 24 Semanas con Ajuste Dinámico de TMB",
+        title=f"Trayectoria Proyectada de Peso a 24 Semanas ({'Simulador' if 'Simulador' in modo_auditoria else 'Actividad Real'})",
         xaxis=dict(title="Semana del Programa", tickmode="linear", tick0=0, dtick=2),
         yaxis=dict(title="Peso Corporal (kg)"),
         height=450,

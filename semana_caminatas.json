@@ -1,9 +1,18 @@
 {
   "Lunes": {
-    "actividades_el": [],
+    "actividades_el": [
+      {
+        "id": "el_192039047177",
+        "nombre": "Caminata Paso Constante",
+        "icono": "🚶",
+        "minutos": 120,
+        "kcal": 520.0,
+        "modo": "Reloj"
+      }
+    ],
     "actividades_ella": [],
-    "horas_el": 0.0,
-    "kcal_el": 0,
+    "horas_el": 2.0,
+    "kcal_el": 520.0,
     "horas_ella": 0.0,
     "kcal_ella": 0
   },

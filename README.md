@@ -32,10 +32,14 @@ Plataforma analítica e interactiva desarrollada con **Streamlit** y **Plotly**,
     * **⌚ Por Calorías de Reloj Inteligente (kcal directas):** Ingreso manual del gasto calórico activo exacto reportado por tu smartwatch (Apple Watch, Garmin, Xiaomi, Fitbit, Galaxy Watch, etc.).
   * **Asignación Flexible:** Carga actividades para *Solo Él*, *Solo Ella* o para *Ambos (juntos)* con cálculo simultáneo adaptado al peso de cada uno.
   * **Gestión Visual:** Lista con badges, minutos, calorías quemadas y botón `❌` para eliminar actividades individuales.
+* **🎯 Monitor de Cumplimiento Diario de Macros (P, C, G):** En cada día de la semana, compara los gramos consumidos contra la meta diaria asignada (Proteína, Carbohidratos y Grasas) para Él y para Ella, mostrando barras de progreso y badges dinámicos con alerta de gramos faltantes (`⏳ Déficit`) o superados (`⚠️ Exceso`).
 * **Balance Diario y Semanal Real:** Suma el gasto base en reposo más todas las actividades registradas del día, calculando el balance neto diario y acumulado de 7 días.
 * **Gráfica Comparativa Dinámica:** Barras de ingesta calórica vs. líneas de gasto real diario (que se elevan en función de la cantidad e intensidad de actividades registradas) y líneas de meta diaria.
 
 ### 3. 🔥 Auditoría Metabólica & Simulador de Caminatas
+* **🔬 Modo Dual de Auditoría & Proyección:**
+  * **🏃‍♂️ Actividad Real Semanal:** Audita y proyecta a partir de los datos reales registrados día a día en el Registro Semanal.
+  * **🔮 Simulador Teórico ("¿Qué pasaría si...?"):** Slider interactivo manual (0 a 14 h/semana) e intensidad METs para modelar escenarios hipotéticos de pérdida de peso en el tiempo.
 * **Fórmulas Científicas:**
   * **TMB (Mifflin-St Jeor):** Gasto basal vital según peso, altura y edad.
   * **Gasto Base (Día de Descanso):** Factor $1.2 \times TMB$ (gasto en días sin caminata).
