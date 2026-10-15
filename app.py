@@ -278,6 +278,7 @@ def guardar_recetas_guardadas(recetas_dict):
         st.error(f"Error al guardar recetas favoritas: {e}")
 
 ARCHIVO_SEMANA = "semana_alimentos.json"
+ARCHIVO_CAMINATAS_SEMANA = "semana_caminatas.json"
 DIAS_SEMANA = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
 
 def cargar_semana_alimentos():
@@ -301,6 +302,30 @@ def guardar_semana_alimentos(dict_semana):
     except Exception as e:
         st.error(f"Error al guardar plan semanal: {e}")
 
+def cargar_caminatas_semana():
+    base = {d: {"horas_el": 0.0, "horas_ella": 0.0} for d in DIAS_SEMANA}
+    if os.path.exists(ARCHIVO_CAMINATAS_SEMANA):
+        try:
+            with open(ARCHIVO_CAMINATAS_SEMANA, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                for d in DIAS_SEMANA:
+                    if d in data:
+                        base[d] = {
+                            "horas_el": float(data[d].get("horas_el", 0.0)),
+                            "horas_ella": float(data[d].get("horas_ella", 0.0))
+                        }
+                return base
+        except Exception:
+            return base
+    return base
+
+def guardar_caminatas_semana(dict_caminatas):
+    try:
+        with open(ARCHIVO_CAMINATAS_SEMANA, "w", encoding="utf-8") as f:
+            json.dump(dict_caminatas, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        st.error(f"Error al guardar caminatas semanales: {e}")
+
 # Inicialización en session_state con persistencia local
 if "alimentos_custom" not in st.session_state:
     st.session_state.alimentos_custom = cargar_alimentos_custom()
@@ -310,6 +335,9 @@ if "recetas_guardadas" not in st.session_state:
 
 if "semana_alimentos" not in st.session_state:
     st.session_state.semana_alimentos = cargar_semana_alimentos()
+
+if "semana_caminatas" not in st.session_state:
+    st.session_state.semana_caminatas = cargar_caminatas_semana()
 
 if "dia_semana_sel" not in st.session_state:
     st.session_state.dia_semana_sel = "Lunes"
@@ -1244,15 +1272,65 @@ with tab_sem:
                 st.rerun()
 
     # Visualización Día por Día
-    st.markdown("#### 📋 Comidas Registradas Día por Día")
+    st.markdown("#### 📋 Comidas y Actividad Registradas Día por Día")
     tabs_dias = st.tabs(DIAS_SEMANA)
     for i_dia, dia_nom in enumerate(DIAS_SEMANA):
         with tabs_dias[i_dia]:
+            # Registro de caminata de este día específico
+            cam_data_dia = st.session_state.semana_caminatas.get(dia_nom, {"horas_el": 0.0, "horas_ella": 0.0})
+            h_act_el = float(cam_data_dia.get("horas_el", 0.0))
+            h_act_ella = float(cam_data_dia.get("horas_ella", 0.0))
+
+            st.markdown(f"""
+            <div style="background: rgba(30, 41, 59, 0.45); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; padding: 10px 16px; margin-bottom: 14px;">
+                <div style="color: #38bdf8; font-weight: 700; font-size: 0.95rem; margin-bottom: 4px;">🚶 Registro de Caminata Real de {dia_nom}</div>
+                <span style="font-size: 0.8rem; color: #94a3b8;">Ingresa cuánto caminó cada uno hoy para calcular su gasto calórico real del día:</span>
+            </div>
+            """, unsafe_allow_html=True)
+
+            cw1, cw2, cw3, cw4 = st.columns([1.5, 1.5, 1.6, 1.6])
+            with cw1:
+                nueva_h_el = st.number_input(
+                    f"Caminata Él (horas)", min_value=0.0, max_value=12.0, value=h_act_el, step=0.25,
+                    key=f"cam_h_el_{dia_nom}",
+                    help="1.0 = 1h (60 min) | 0.5 = 30 min | 0.25 = 15 min | 1.5 = 1h 30 min"
+                )
+            with cw2:
+                nueva_h_ella = st.number_input(
+                    f"Caminata Ella (horas)", min_value=0.0, max_value=12.0, value=h_act_ella, step=0.25,
+                    key=f"cam_h_ella_{dia_nom}",
+                    help="1.0 = 1h (60 min) | 0.5 = 30 min | 0.25 = 15 min | 1.5 = 1h 30 min"
+                )
+
+            if nueva_h_el != h_act_el or nueva_h_ella != h_act_ella:
+                st.session_state.semana_caminatas[dia_nom] = {
+                    "horas_el": float(nueva_h_el),
+                    "horas_ella": float(nueva_h_ella)
+                }
+                guardar_caminatas_semana(st.session_state.semana_caminatas)
+                st.rerun()
+
+            # Gasto real del día
+            quema_dia_cam_el = nueva_h_el * quema_1h_el
+            quema_dia_cam_ella = nueva_h_ella * quema_1h_ella
+            gasto_real_dia_el = sed_el + quema_dia_cam_el
+            gasto_real_dia_ella = sed_ella + quema_dia_cam_ella
+
+            with cw3:
+                delta_el_cam = f"+{quema_dia_cam_el:.0f} kcal caminata ({nueva_h_el:.2f}h)" if nueva_h_el > 0 else "Descanso (0h caminata)"
+                st.metric("Gasto Real Hoy (Él)", f"{gasto_real_dia_el:.0f} kcal", delta_el_cam)
+            with cw4:
+                delta_ella_cam = f"+{quema_dia_cam_ella:.0f} kcal caminata ({nueva_h_ella:.2f}h)" if nueva_h_ella > 0 else "Descanso (0h caminata)"
+                st.metric("Gasto Real Hoy (Ella)", f"{gasto_real_dia_ella:.0f} kcal", delta_ella_cam)
+
+            st.markdown("---")
+
+            # Comidas de ese día
             comidas_dia = st.session_state.semana_alimentos.get(dia_nom, [])
-            if comidas_dia:
-                c_t1, c_t2 = st.columns([3.8, 1.2])
-                with c_t1:
-                    st.markdown(f"##### Comidas cargadas en {dia_nom}:")
+            c_t1, c_t2 = st.columns([3.5, 1.5])
+            with c_t1:
+                st.markdown(f"##### 🍽️ Comidas cargadas en {dia_nom}:")
+                if comidas_dia:
                     for idx_c, c_item in enumerate(comidas_dia):
                         row_c1, row_c2, row_c3, row_c4 = st.columns([3.2, 2.5, 2.5, 0.8])
                         with row_c1:
@@ -1266,39 +1344,109 @@ with tab_sem:
                                 st.session_state.semana_alimentos[dia_nom].pop(idx_c)
                                 guardar_semana_alimentos(st.session_state.semana_alimentos)
                                 st.rerun()
-                with c_t2:
-                    tot_dia_el_k = sum(c["el_kcal"] for c in comidas_dia)
-                    tot_dia_ella_k = sum(c["ella_kcal"] for c in comidas_dia)
-                    st.markdown(f"**Totales {dia_nom}:**")
-                    dif_el_dia = meta_kcal_el - tot_dia_el_k
-                    dif_ella_dia = meta_kcal_ella - tot_dia_ella_k
-                    st.write(f"👨 Él: **{tot_dia_el_k:.0f} / {meta_kcal_el:.0f} kcal**")
-                    st.caption(f"{'Restan ' + str(round(dif_el_dia)) if dif_el_dia >= 0 else 'Exceso +' + str(round(abs(dif_el_dia)))} kcal")
-                    st.write(f"👩 Ella: **{tot_dia_ella_k:.0f} / {meta_kcal_ella:.0f} kcal**")
-                    st.caption(f"{'Restan ' + str(round(dif_ella_dia)) if dif_ella_dia >= 0 else 'Exceso +' + str(round(abs(dif_ella_dia)))} kcal")
-                    if st.button(f"🗑️ Vaciar {dia_nom}", key=f"btn_vaciar_{dia_nom}", use_container_width=True):
-                        st.session_state.semana_alimentos[dia_nom] = []
-                        guardar_semana_alimentos(st.session_state.semana_alimentos)
-                        st.rerun()
-            else:
-                st.info(f"No hay comidas cargadas para el {dia_nom}. Puedes enviarlas desde el Armador de Olla o cargarlas arriba.")
+                else:
+                    st.info(f"No hay comidas cargadas para el {dia_nom}. Puedes cargarlas arriba o con el formulario rápido de abajo.")
 
-    # Totales y Balance Semanal
+                # Cargador rápido dentro del mismo día
+                with st.expander(f"➕ Agregar alimento directo a {dia_nom}", expanded=False):
+                    cd_a1, cd_a2, cd_a3, cd_a4 = st.columns([2.5, 1.2, 1.5, 1.0])
+                    with cd_a1:
+                        ali_rap_dia = st.selectbox("Alimento", sorted(df_alimentos["nombre"].unique()), key=f"ali_rap_{dia_nom}")
+                    with cd_a2:
+                        gr_rap_dia = st.number_input("Gramos", min_value=1.0, max_value=2500.0, value=100.0, step=10.0, key=f"gr_rap_{dia_nom}")
+                    with cd_a3:
+                        qui_rap_dia = st.selectbox("Para:", ["Solo Él", "Solo Ella", "Ambos (Olla)"], key=f"qui_rap_{dia_nom}")
+                    with cd_a4:
+                        st.write("")
+                        st.write("")
+                        if st.button("➕ Cargar", key=f"btn_add_rap_{dia_nom}"):
+                            row_rd = df_alimentos[df_alimentos["nombre"] == ali_rap_dia].iloc[0]
+                            f_rd = gr_rap_dia / 100.0
+                            k_rd = row_rd["kcal"] * f_rd
+                            p_rd = row_rd["p"] * f_rd
+                            c_rd = row_rd["c"] * f_rd
+                            g_rd = row_rd["g"] * f_rd
+                            if qui_rap_dia == "Solo Él":
+                                el_k, el_p, el_c, el_g = k_rd, p_rd, c_rd, g_rd
+                                ella_k, ella_p, ella_c, ella_g = 0.0, 0.0, 0.0, 0.0
+                            elif qui_rap_dia == "Solo Ella":
+                                el_k, el_p, el_c, el_g = 0.0, 0.0, 0.0, 0.0
+                                ella_k, ella_p, ella_c, ella_g = k_rd, p_rd, c_rd, g_rd
+                            else:
+                                el_k, el_p, el_c, el_g = k_rd * prop_el, p_rd * prop_el, c_rd * prop_el, g_rd * prop_el
+                                ella_k, ella_p, ella_c, ella_g = k_rd * prop_ella, p_rd * prop_ella, c_rd * prop_ella, g_rd * prop_ella
+                            st.session_state.semana_alimentos[dia_nom].append({
+                                "id": len(st.session_state.semana_alimentos[dia_nom]) + 1,
+                                "descripcion": f"{gr_rap_dia:.0f}g {ali_rap_dia}",
+                                "el_kcal": round(el_k, 1), "el_p": round(el_p, 1), "el_c": round(el_c, 1), "el_g": round(el_g, 1),
+                                "ella_kcal": round(ella_k, 1), "ella_p": round(ella_p, 1), "ella_c": round(ella_c, 1), "ella_g": round(ella_g, 1)
+                            })
+                            guardar_semana_alimentos(st.session_state.semana_alimentos)
+                            st.rerun()
+
+            with c_t2:
+                tot_dia_el_k = sum(c["el_kcal"] for c in comidas_dia)
+                tot_dia_ella_k = sum(c["ella_kcal"] for c in comidas_dia)
+
+                st.markdown(f"**Resumen Real de {dia_nom}:**")
+                
+                # Balance de Él hoy
+                bal_hoy_el = gasto_real_dia_el - tot_dia_el_k
+                st.markdown("**👨 Él:**")
+                st.write(f"Consumo: **{tot_dia_el_k:.0f} kcal**")
+                st.write(f"Gasto real: **{gasto_real_dia_el:.0f} kcal**")
+                if bal_hoy_el >= 50:
+                    st.markdown(f"<span style='color:#10b981; font-weight:700;'>📉 Déficit hoy: -{bal_hoy_el:.0f} kcal</span>", unsafe_allow_html=True)
+                elif bal_hoy_el <= -50:
+                    st.markdown(f"<span style='color:#60a5fa; font-weight:700;'>📈 Superávit hoy: +{abs(bal_hoy_el):.0f} kcal</span>", unsafe_allow_html=True)
+                else:
+                    st.markdown("<span style='color:#94a3b8; font-weight:700;'>⚖️ Equilibrio hoy</span>", unsafe_allow_html=True)
+
+                st.markdown("---")
+
+                # Balance de Ella hoy
+                bal_hoy_ella = gasto_real_dia_ella - tot_dia_ella_k
+                st.markdown("**👩 Ella:**")
+                st.write(f"Consumo: **{tot_dia_ella_k:.0f} kcal**")
+                st.write(f"Gasto real: **{gasto_real_dia_ella:.0f} kcal**")
+                if bal_hoy_ella >= 50:
+                    st.markdown(f"<span style='color:#10b981; font-weight:700;'>📉 Déficit hoy: -{bal_hoy_ella:.0f} kcal</span>", unsafe_allow_html=True)
+                elif bal_hoy_ella <= -50:
+                    st.markdown(f"<span style='color:#ec4899; font-weight:700;'>📈 Superávit hoy: +{abs(bal_hoy_ella):.0f} kcal</span>", unsafe_allow_html=True)
+                else:
+                    st.markdown("<span style='color:#94a3b8; font-weight:700;'>⚖️ Equilibrio hoy</span>", unsafe_allow_html=True)
+
+                st.markdown("<br>", unsafe_allow_html=True)
+                if comidas_dia and st.button(f"🗑️ Vaciar comidas de {dia_nom}", key=f"btn_vaciar_{dia_nom}", use_container_width=True):
+                    st.session_state.semana_alimentos[dia_nom] = []
+                    guardar_semana_alimentos(st.session_state.semana_alimentos)
+                    st.rerun()
+
+    # Totales y Balance Semanal Acumulado
     st.markdown("---")
     st.markdown("#### 📊 Balance Metabólico Semanal Acumulado (7 Días)")
-    
+    st.caption("Cálculo exacto: Suma el gasto real de cada día (según las horas caminadas ese día) frente al consumo real acumulado.")
+
+    # Totales de caminata en la semana
+    total_h_cam_el = sum(st.session_state.semana_caminatas.get(d, {}).get("horas_el", 0.0) for d in DIAS_SEMANA)
+    total_h_cam_ella = sum(st.session_state.semana_caminatas.get(d, {}).get("horas_ella", 0.0) for d in DIAS_SEMANA)
+
+    # Gasto real día por día
+    gastos_reales_el = [sed_el + (st.session_state.semana_caminatas.get(d, {}).get("horas_el", 0.0) * quema_1h_el) for d in DIAS_SEMANA]
+    gastos_reales_ella = [sed_ella + (st.session_state.semana_caminatas.get(d, {}).get("horas_ella", 0.0) * quema_1h_ella) for d in DIAS_SEMANA]
+
+    gasto_sem_real_el = sum(gastos_reales_el)
+    gasto_sem_real_ella = sum(gastos_reales_ella)
+
     consumo_dias_el = [sum(c["el_kcal"] for c in st.session_state.semana_alimentos.get(d, [])) for d in DIAS_SEMANA]
     consumo_dias_ella = [sum(c["ella_kcal"] for c in st.session_state.semana_alimentos.get(d, [])) for d in DIAS_SEMANA]
-    
+
     total_sem_el_k = sum(consumo_dias_el)
     total_sem_ella_k = sum(consumo_dias_ella)
-    
-    gasto_sem_el = tdee_prom_el * 7.0
-    gasto_sem_ella = tdee_prom_ella * 7.0
-    
-    neto_sem_el = gasto_sem_el - total_sem_el_k  # positivo = deficit, negativo = superavit
-    neto_sem_ella = gasto_sem_ella - total_sem_ella_k
-    
+
+    neto_sem_el = gasto_sem_real_el - total_sem_el_k  # positivo = deficit, negativo = superavit
+    neto_sem_ella = gasto_sem_real_ella - total_sem_ella_k
+
     kg_sem_real_el = abs(neto_sem_el) / 7700.0
     kg_sem_real_ella = abs(neto_sem_ella) / 7700.0
 
@@ -1306,42 +1454,42 @@ with tab_sem:
     with col_b_el:
         st.markdown("""
         <div class="profile-card-he">
-            <strong style="color: #60a5fa; font-size: 1.15rem;">👨 Balance Semanal de Él</strong>
+            <strong style="color: #60a5fa; font-size: 1.15rem;">👨 Balance Semanal Real de Él</strong>
         </div>
         """, unsafe_allow_html=True)
         cb_1, cb_2, cb_3 = st.columns(3)
         with cb_1:
             st.metric("Consumo 7 Días", f"{total_sem_el_k:.0f} kcal", f"Prom: {(total_sem_el_k/7):.0f} kcal/día")
         with cb_2:
-            st.metric("Gasto Semanal TDEE", f"{gasto_sem_el:.0f} kcal", f"{tdee_prom_el:.0f} kcal/día")
+            st.metric("Gasto Real 7 Días", f"{gasto_sem_real_el:.0f} kcal", f"🚶 {total_h_cam_el:.1f}h caminadas")
         with cb_3:
             if neto_sem_el >= 50:
-                st.metric("Déficit Semanal", f"-{neto_sem_el:.0f} kcal", f"-{kg_sem_real_el:.2f} kg grasa")
+                st.metric("Déficit Semanal Real", f"-{neto_sem_el:.0f} kcal", f"-{kg_sem_real_el:.2f} kg grasa")
             elif neto_sem_el <= -50:
-                st.metric("Superávit Semanal", f"+{abs(neto_sem_el):.0f} kcal", f"+{kg_sem_real_el:.2f} kg ganados", delta_color="inverse")
+                st.metric("Superávit Semanal Real", f"+{abs(neto_sem_el):.0f} kcal", f"+{kg_sem_real_el:.2f} kg ganados", delta_color="inverse")
             else:
-                st.metric("Balance Semanal", "0 kcal", "Mantenimiento")
+                st.metric("Balance Semanal Real", "0 kcal", "Mantenimiento")
 
     with col_b_ella:
         st.markdown("""
         <div class="profile-card-she">
-            <strong style="color: #f472b6; font-size: 1.15rem;">👩 Balance Semanal de Ella</strong>
+            <strong style="color: #f472b6; font-size: 1.15rem;">👩 Balance Semanal Real de Ella</strong>
         </div>
         """, unsafe_allow_html=True)
         cb_4, cb_5, cb_6 = st.columns(3)
         with cb_4:
             st.metric("Consumo 7 Días", f"{total_sem_ella_k:.0f} kcal", f"Prom: {(total_sem_ella_k/7):.0f} kcal/día")
         with cb_5:
-            st.metric("Gasto Semanal TDEE", f"{gasto_sem_ella:.0f} kcal", f"{tdee_prom_ella:.0f} kcal/día")
-        with cb_3 if False else cb_6:
+            st.metric("Gasto Real 7 Días", f"{gasto_sem_real_ella:.0f} kcal", f"🚶 {total_h_cam_ella:.1f}h caminadas")
+        with cb_6:
             if neto_sem_ella >= 50:
-                st.metric("Déficit Semanal", f"-{neto_sem_ella:.0f} kcal", f"-{kg_sem_real_ella:.2f} kg grasa")
+                st.metric("Déficit Semanal Real", f"-{neto_sem_ella:.0f} kcal", f"-{kg_sem_real_ella:.2f} kg grasa")
             elif neto_sem_ella <= -50:
-                st.metric("Superávit Semanal", f"+{abs(neto_sem_ella):.0f} kcal", f"+{kg_sem_real_ella:.2f} kg ganados", delta_color="inverse")
+                st.metric("Superávit Semanal Real", f"+{abs(neto_sem_ella):.0f} kcal", f"+{kg_sem_real_ella:.2f} kg ganados", delta_color="inverse")
             else:
-                st.metric("Balance Semanal", "0 kcal", "Mantenimiento")
+                st.metric("Balance Semanal Real", "0 kcal", "Mantenimiento")
 
-    # Gráfico de Consumo Diario vs Meta
+    # Gráfico Comparativo de Consumo vs Gasto Real Diario
     fig_sem = go.Figure()
     fig_sem.add_trace(go.Bar(
         name="Consumo Él (kcal)",
@@ -1356,36 +1504,54 @@ with tab_sem:
         marker_color="#ec4899"
     ))
     fig_sem.add_trace(go.Scatter(
+        name="Gasto Real Día Él",
+        x=DIAS_SEMANA,
+        y=gastos_reales_el,
+        mode="lines+markers",
+        line=dict(color="#60a5fa", width=2.5),
+        marker=dict(size=7, symbol="diamond")
+    ))
+    fig_sem.add_trace(go.Scatter(
+        name="Gasto Real Día Ella",
+        x=DIAS_SEMANA,
+        y=gastos_reales_ella,
+        mode="lines+markers",
+        line=dict(color="#f472b6", width=2.5),
+        marker=dict(size=7, symbol="circle")
+    ))
+    fig_sem.add_trace(go.Scatter(
         name="Meta Diaria Él",
         x=DIAS_SEMANA,
         y=[meta_kcal_el] * 7,
         mode="lines",
-        line=dict(color="#60a5fa", width=2, dash="dash")
+        line=dict(color="#93c5fd", width=1.5, dash="dash")
     ))
     fig_sem.add_trace(go.Scatter(
         name="Meta Diaria Ella",
         x=DIAS_SEMANA,
         y=[meta_kcal_ella] * 7,
         mode="lines",
-        line=dict(color="#f472b6", width=2, dash="dash")
+        line=dict(color="#fbcfe8", width=1.5, dash="dash")
     ))
     fig_sem.update_layout(
         barmode='group',
         template="plotly_dark",
-        title="Consumo Calórico Diario por Día (Lunes a Domingo) vs. Metas",
+        title="Consumo Diario vs. Gasto Energético Real de Cada Día (según caminata)",
         xaxis=dict(title="Día de la Semana"),
         yaxis=dict(title="Calorías (kcal)"),
-        height=370,
+        height=390,
         margin=dict(l=40, r=20, t=40, b=30),
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
     )
     st.plotly_chart(fig_sem, use_container_width=True)
 
-    col_btn_sem1, col_btn_sem2 = st.columns([1.5, 3.5])
+    col_btn_sem1, col_btn_sem2 = st.columns([2, 3])
     with col_btn_sem1:
-        if st.button("🗑️ Reiniciar Semana Completa (Borrar 7 días)", key="btn_reset_semana", use_container_width=True):
+        if st.button("🗑️ Reiniciar Semana Completa (Comidas y Caminatas)", key="btn_reset_semana", use_container_width=True):
             st.session_state.semana_alimentos = {d: [] for d in DIAS_SEMANA}
+            st.session_state.semana_caminatas = {d: {"horas_el": 0.0, "horas_ella": 0.0} for d in DIAS_SEMANA}
             guardar_semana_alimentos(st.session_state.semana_alimentos)
+            guardar_caminatas_semana(st.session_state.semana_caminatas)
             st.success("¡Semana reiniciada exitosamente!")
             st.rerun()
 with tab2:
@@ -1405,11 +1571,11 @@ with tab2:
         m_c1, m_c2 = st.columns(2)
         with m_c1:
             st.metric("Piso Vital (TMB)", f"{tmb_el:.0f} kcal", help="Mifflin-St Jeor: Calorías mínimas para subsistir en reposo absoluto.")
-            st.metric("Techo Sedentario", f"{sed_el:.0f} kcal", help="TMB * 1.2: Límite para no engordar sin hacer actividad física.")
+            st.metric("Gasto Base (Día Descanso)", f"{sed_el:.0f} kcal", help="TMB * 1.2: Calorías que quemas un día que te quedas en casa y no sales a caminar.")
             st.metric("TDEE Promedio Semanal", f"{tdee_prom_el:.0f} kcal", help="Gasto promedio diario incluyendo tus horas de caminata.")
         with m_c2:
             st.metric("Quema 1h Caminata", f"{quema_1h_el:.0f} kcal", f"{mets_val} METs x {peso_el:.0f}kg", help="Fórmula: METs * Peso * 1h")
-            st.metric("Techo Día con Caminata", f"{techo_cam_el:.0f} kcal", help="Sedentario + 1 hora de caminata.")
+            st.metric("Gasto Día con Caminata (1h)", f"{techo_cam_el:.0f} kcal", help="Gasto Base + 1 hora de caminata.")
             st.metric(
                 "Meta Calórica Asignada",
                 f"{meta_kcal_el:.0f} kcal",
@@ -1461,11 +1627,11 @@ with tab2:
         m_c3, m_c4 = st.columns(2)
         with m_c3:
             st.metric("Piso Vital (TMB)", f"{tmb_ella:.0f} kcal", help="Mifflin-St Jeor: Gasto mínimo para funciones vitales.")
-            st.metric("Techo Sedentario", f"{sed_ella:.0f} kcal", help="TMB * 1.2: Límite para no engordar en reposo.")
+            st.metric("Gasto Base (Día Descanso)", f"{sed_ella:.0f} kcal", help="TMB * 1.2: Calorías que quemas un día que te quedas en casa y no sales a caminar.")
             st.metric("TDEE Promedio Semanal", f"{tdee_prom_ella:.0f} kcal", help="Gasto promedio diario incluyendo tus horas de caminata.")
         with m_c4:
             st.metric("Quema 1h Caminata", f"{quema_1h_ella:.0f} kcal", f"{mets_val} METs x {peso_ella:.0f}kg", help="Fórmula: METs * Peso * 1h")
-            st.metric("Techo Día con Caminata", f"{techo_cam_ella:.0f} kcal", help="Sedentario + 1 hora de caminata.")
+            st.metric("Gasto Día con Caminata (1h)", f"{techo_cam_ella:.0f} kcal", help="Gasto Base + 1 hora de caminata.")
             st.metric(
                 "Meta Calórica Asignada",
                 f"{meta_kcal_ella:.0f} kcal",

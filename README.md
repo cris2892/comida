@@ -23,13 +23,14 @@ Plataforma analítica e interactiva desarrollada con **Streamlit** y **Plotly**,
 * **Planificación Día a Día:** Pestañas dedicadas para cada día de la semana (Lunes a Domingo).
 * **Carga Rápida:** Asigna comidas completas desde la Olla Compartida o agrega snacks/alimentos individuales para *Solo Él*, *Solo Ella* o *Ambos*.
 * **Control Detallado:** Lista por día con calorías, proteínas, carbohidratos, grasas y botón `❌` para eliminar ítems específicos.
-* **Balance Metabólico Semanal (7 Días):** Compara el consumo acumulado de los 7 días contra el gasto energético real ($TDEE \times 7$), reportando si la semana cerró en **Déficit Semanal Real** (kg de grasa perdidos) o **Superávit Semanal Real** (kg ganados).
-* **Gráfica Comparativa:** Barras de ingesta diaria vs. líneas de meta diaria de ambos.
+* **🚶 Registro Diario de Caminatas:** Permite ingresar cuánto caminó cada uno en ese día específico (en horas/minutos). El sistema calcula la quema exacta por caminata ($METs \times peso \times horas$) y el **Gasto Calórico Real de ese día** (Gasto Base en descanso + Quema de caminata).
+* **Balance Diario y Semanal Real:** Muestra el déficit o superávit neto real de cada día y de los 7 días completos sumando el gasto real según los días activos frente al consumo acumulado.
+* **Gráfica Comparativa:** Barras de ingesta diaria vs. curvas de gasto real diario de cada uno (que ascienden en días activos y bajan en días de descanso) y líneas de meta diaria.
 
 ### 3. 🔥 Auditoría Metabólica & Simulador de Caminatas
 * **Fórmulas Científicas:**
   * **TMB (Mifflin-St Jeor):** Gasto basal vital según peso, altura y edad.
-  * **Techo Sedentario:** Factor $1.2 \times TMB$.
+  * **Gasto Base (Día de Descanso):** Factor $1.2 \times TMB$ (gasto en días sin caminata).
   * **Gasto por Caminata (METs):** Quema calórica exacta en función del peso y ritmo de caminata (3.0, 4.0 o 4.8 METs).
   * **Gasto Energético Total Diario (TDEE Real):** Promedio diario incluyendo las horas de actividad física semanal.
 * **Objetivos Metabólicos Configurables:**
@@ -57,6 +58,7 @@ No requiere bases de datos externas ni conexión a internet para funcionar. Toda
 | `alimentos_custom.json` | Catálogo de alimentos personalizados cargados por el usuario. |
 | `recetas_guardadas.json` | Recetario de platos preparados guardados. |
 | `semana_alimentos.json` | Registro de comidas del lunes al domingo. |
+| `semana_caminatas.json` | Registro de horas de caminata diaria del lunes al domingo. |
 | `registro_peso.csv` | Historial de pesajes y notas periódicas. |
 
 ---
