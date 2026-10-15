@@ -23,7 +23,10 @@ Plataforma analítica e interactiva desarrollada con **Streamlit** y **Plotly**,
 * **Planificación Día a Día:** Pestañas dedicadas para cada día de la semana (Lunes a Domingo).
 * **Carga Rápida:** Asigna comidas completas desde la Olla Compartida o agrega snacks/alimentos individuales para *Solo Él*, *Solo Ella* o *Ambos*.
 * **Control Detallado:** Lista por día con calorías, proteínas, carbohidratos, grasas y botón `❌` para eliminar ítems específicos.
-* **🚶 Registro Diario de Caminatas:** Permite ingresar cuánto caminó cada uno en ese día específico (en horas/minutos). El sistema calcula la quema exacta por caminata ($METs \times peso \times horas$) y el **Gasto Calórico Real de ese día** (Gasto Base en descanso + Quema de caminata).
+* **🏃/⌚ Registro Diario de Ejercicio & Reloj Inteligente:** Permite registrar la actividad física diaria de dos formas independientes para Él y para Ella:
+  * **⏱️ Horas Caminadas (METs):** Calcula la quema calórica exacta según el peso corporal y la duración ($METs \times peso \times horas$).
+  * **⌚ Calorías de Reloj Inteligente (kcal):** Permite ingresar directamente las calorías activas medidas por tu smartwatch (Apple Watch, Garmin, Xiaomi, Fitbit, Samsung Galaxy Watch, etc.).
+  * El sistema calcula el **Gasto Calórico Real del día** (Gasto Base en descanso + Quema activa) y actualiza automáticamente el balance neto diario.
 * **Balance Diario y Semanal Real:** Muestra el déficit o superávit neto real de cada día y de los 7 días completos sumando el gasto real según los días activos frente al consumo acumulado.
 * **Gráfica Comparativa:** Barras de ingesta diaria vs. curvas de gasto real diario de cada uno (que ascienden en días activos y bajan en días de descanso) y líneas de meta diaria.
 
@@ -58,7 +61,7 @@ No requiere bases de datos externas ni conexión a internet para funcionar. Toda
 | `alimentos_custom.json` | Catálogo de alimentos personalizados cargados por el usuario. |
 | `recetas_guardadas.json` | Recetario de platos preparados guardados. |
 | `semana_alimentos.json` | Registro de comidas del lunes al domingo. |
-| `semana_caminatas.json` | Registro de horas de caminata diaria del lunes al domingo. |
+| `semana_caminatas.json` | Registro de actividad física diaria (horas o calorías de reloj) del lunes al domingo. |
 | `registro_peso.csv` | Historial de pesajes y notas periódicas. |
 
 ---

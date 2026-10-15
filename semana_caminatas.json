@@ -1,0 +1,30 @@
+{
+  "Lunes": {
+    "horas_el": 0.76,
+    "horas_ella": 0.0
+  },
+  "Martes": {
+    "horas_el": 0.0,
+    "horas_ella": 0.0
+  },
+  "Miércoles": {
+    "horas_el": 0.0,
+    "horas_ella": 0.0
+  },
+  "Jueves": {
+    "horas_el": 0.0,
+    "horas_ella": 0.0
+  },
+  "Viernes": {
+    "horas_el": 0.0,
+    "horas_ella": 0.0
+  },
+  "Sábado": {
+    "horas_el": 0.0,
+    "horas_ella": 0.0
+  },
+  "Domingo": {
+    "horas_el": 0.0,
+    "horas_ella": 0.0
+  }
+}

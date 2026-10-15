@@ -303,7 +303,16 @@ def guardar_semana_alimentos(dict_semana):
         st.error(f"Error al guardar plan semanal: {e}")
 
 def cargar_caminatas_semana():
-    base = {d: {"horas_el": 0.0, "horas_ella": 0.0} for d in DIAS_SEMANA}
+    base = {
+        d: {
+            "modo_el": "⏱️ Horas Caminadas (METs)",
+            "horas_el": 0.0,
+            "kcal_el": 0.0,
+            "modo_ella": "⏱️ Horas Caminadas (METs)",
+            "horas_ella": 0.0,
+            "kcal_ella": 0.0
+        } for d in DIAS_SEMANA
+    }
     if os.path.exists(ARCHIVO_CAMINATAS_SEMANA):
         try:
             with open(ARCHIVO_CAMINATAS_SEMANA, "r", encoding="utf-8") as f:
@@ -311,8 +320,12 @@ def cargar_caminatas_semana():
                 for d in DIAS_SEMANA:
                     if d in data:
                         base[d] = {
+                            "modo_el": data[d].get("modo_el", "⏱️ Horas Caminadas (METs)"),
                             "horas_el": float(data[d].get("horas_el", 0.0)),
-                            "horas_ella": float(data[d].get("horas_ella", 0.0))
+                            "kcal_el": float(data[d].get("kcal_el", 0.0)),
+                            "modo_ella": data[d].get("modo_ella", "⏱️ Horas Caminadas (METs)"),
+                            "horas_ella": float(data[d].get("horas_ella", 0.0)),
+                            "kcal_ella": float(data[d].get("kcal_ella", 0.0))
                         }
                 return base
         except Exception:
@@ -1276,52 +1289,93 @@ with tab_sem:
     tabs_dias = st.tabs(DIAS_SEMANA)
     for i_dia, dia_nom in enumerate(DIAS_SEMANA):
         with tabs_dias[i_dia]:
-            # Registro de caminata de este día específico
-            cam_data_dia = st.session_state.semana_caminatas.get(dia_nom, {"horas_el": 0.0, "horas_ella": 0.0})
-            h_act_el = float(cam_data_dia.get("horas_el", 0.0))
-            h_act_ella = float(cam_data_dia.get("horas_ella", 0.0))
+            # Registro de actividad / caminata de este día específico
+            cam_data_dia = st.session_state.semana_caminatas.get(dia_nom, {})
+            m_guardado_el = cam_data_dia.get("modo_el", "⏱️ Horas Caminadas (METs)")
+            h_guardada_el = float(cam_data_dia.get("horas_el", 0.0))
+            k_guardada_el = float(cam_data_dia.get("kcal_el", 0.0))
+
+            m_guardado_ella = cam_data_dia.get("modo_ella", "⏱️ Horas Caminadas (METs)")
+            h_guardada_ella = float(cam_data_dia.get("horas_ella", 0.0))
+            k_guardada_ella = float(cam_data_dia.get("kcal_ella", 0.0))
 
             st.markdown(f"""
-            <div style="background: rgba(30, 41, 59, 0.45); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; padding: 10px 16px; margin-bottom: 14px;">
-                <div style="color: #38bdf8; font-weight: 700; font-size: 0.95rem; margin-bottom: 4px;">🚶 Registro de Caminata Real de {dia_nom}</div>
-                <span style="font-size: 0.8rem; color: #94a3b8;">Ingresa cuánto caminó cada uno hoy para calcular su gasto calórico real del día:</span>
+            <div style="background: rgba(30, 41, 59, 0.45); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; padding: 12px 16px; margin-bottom: 14px;">
+                <div style="color: #38bdf8; font-weight: 700; font-size: 0.95rem; margin-bottom: 4px;">🏃 Actividad & Ejercicio Real de {dia_nom}</div>
+                <span style="font-size: 0.8rem; color: #94a3b8;">Elige cómo registrar la actividad de hoy: por <b>tiempo de caminata (cálculo científico METs)</b> o ingresando directo las <b>calorías quemadas según tu reloj inteligente (Apple Watch, Garmin, Galaxy Watch, etc.)</b>:</span>
             </div>
             """, unsafe_allow_html=True)
 
-            cw1, cw2, cw3, cw4 = st.columns([1.5, 1.5, 1.6, 1.6])
-            with cw1:
-                nueva_h_el = st.number_input(
-                    f"Caminata Él (horas)", min_value=0.0, max_value=12.0, value=h_act_el, step=0.25,
-                    key=f"cam_h_el_{dia_nom}",
-                    help="1.0 = 1h (60 min) | 0.5 = 30 min | 0.25 = 15 min | 1.5 = 1h 30 min"
-                )
-            with cw2:
-                nueva_h_ella = st.number_input(
-                    f"Caminata Ella (horas)", min_value=0.0, max_value=12.0, value=h_act_ella, step=0.25,
-                    key=f"cam_h_ella_{dia_nom}",
-                    help="1.0 = 1h (60 min) | 0.5 = 30 min | 0.25 = 15 min | 1.5 = 1h 30 min"
-                )
+            col_act_el, col_act_ella = st.columns(2)
+            opciones_modo = ["⏱️ Horas Caminadas (METs)", "⌚ Calorías Reloj Inteligente (kcal)"]
 
-            if nueva_h_el != h_act_el or nueva_h_ella != h_act_ella:
+            with col_act_el:
+                st.markdown("<strong style='color: #60a5fa; font-size: 0.95rem;'>👨 Actividad de Él:</strong>", unsafe_allow_html=True)
+                idx_m_el = opciones_modo.index(m_guardado_el) if m_guardado_el in opciones_modo else 0
+                modo_sel_el = st.radio("Método (Él):", opciones_modo, index=idx_m_el, key=f"modo_act_el_{dia_nom}", horizontal=True)
+
+                if modo_sel_el == "⏱️ Horas Caminadas (METs)":
+                    nueva_h_el = st.number_input(
+                        f"Horas caminadas (Él)", min_value=0.0, max_value=12.0, value=h_guardada_el, step=0.25,
+                        key=f"cam_h_el_{dia_nom}",
+                        help="1.0 = 1h (60 min) | 0.5 = 30 min | 0.25 = 15 min"
+                    )
+                    quema_act_el = nueva_h_el * quema_1h_el
+                    nueva_k_el = 0.0
+                    label_quema_el = f"+{quema_act_el:.0f} kcal ({nueva_h_el:.2f}h METs)" if nueva_h_el > 0 else "Descanso (0h)"
+                else:
+                    nueva_k_el = st.number_input(
+                        f"Calorías quemadas según Reloj (Él)", min_value=0.0, max_value=4000.0, value=k_guardada_el, step=10.0,
+                        key=f"cam_kcal_el_{dia_nom}",
+                        help="Ingresa el valor exacto de calorías activas mostrado en tu reloj inteligente."
+                    )
+                    quema_act_el = nueva_k_el
+                    nueva_h_el = round(nueva_k_el / quema_1h_el, 2) if quema_1h_el > 0 else 0.0
+                    label_quema_el = f"+{nueva_k_el:.0f} kcal (⌚ Reloj)" if nueva_k_el > 0 else "Descanso (0 kcal)"
+
+                gasto_real_dia_el = sed_el + quema_act_el
+                st.metric("Gasto Real Hoy (Él)", f"{gasto_real_dia_el:.0f} kcal", label_quema_el)
+
+            with col_act_ella:
+                st.markdown("<strong style='color: #f472b6; font-size: 0.95rem;'>👩 Actividad de Ella:</strong>", unsafe_allow_html=True)
+                idx_m_ella = opciones_modo.index(m_guardado_ella) if m_guardado_ella in opciones_modo else 0
+                modo_sel_ella = st.radio("Método (Ella):", opciones_modo, index=idx_m_ella, key=f"modo_act_ella_{dia_nom}", horizontal=True)
+
+                if modo_sel_ella == "⏱️ Horas Caminadas (METs)":
+                    nueva_h_ella = st.number_input(
+                        f"Horas caminadas (Ella)", min_value=0.0, max_value=12.0, value=h_guardada_ella, step=0.25,
+                        key=f"cam_h_ella_{dia_nom}",
+                        help="1.0 = 1h (60 min) | 0.5 = 30 min | 0.25 = 15 min"
+                    )
+                    quema_act_ella = nueva_h_ella * quema_1h_ella
+                    nueva_k_ella = 0.0
+                    label_quema_ella = f"+{quema_act_ella:.0f} kcal ({nueva_h_ella:.2f}h METs)" if nueva_h_ella > 0 else "Descanso (0h)"
+                else:
+                    nueva_k_ella = st.number_input(
+                        f"Calorías quemadas según Reloj (Ella)", min_value=0.0, max_value=3000.0, value=k_guardada_ella, step=10.0,
+                        key=f"cam_kcal_ella_{dia_nom}",
+                        help="Ingresa el valor exacto de calorías activas mostrado en tu reloj inteligente."
+                    )
+                    quema_act_ella = nueva_k_ella
+                    nueva_h_ella = round(nueva_k_ella / quema_1h_ella, 2) if quema_1h_ella > 0 else 0.0
+                    label_quema_ella = f"+{nueva_k_ella:.0f} kcal (⌚ Reloj)" if nueva_k_ella > 0 else "Descanso (0 kcal)"
+
+                gasto_real_dia_ella = sed_ella + quema_act_ella
+                st.metric("Gasto Real Hoy (Ella)", f"{gasto_real_dia_ella:.0f} kcal", label_quema_ella)
+
+            # Persistir si hubo cambios en actividad
+            if (nueva_h_el != h_guardada_el or nueva_k_el != k_guardada_el or modo_sel_el != m_guardado_el or
+                nueva_h_ella != h_guardada_ella or nueva_k_ella != k_guardada_ella or modo_sel_ella != m_guardado_ella):
                 st.session_state.semana_caminatas[dia_nom] = {
+                    "modo_el": modo_sel_el,
                     "horas_el": float(nueva_h_el),
-                    "horas_ella": float(nueva_h_ella)
+                    "kcal_el": float(nueva_k_el),
+                    "modo_ella": modo_sel_ella,
+                    "horas_ella": float(nueva_h_ella),
+                    "kcal_ella": float(nueva_k_ella)
                 }
                 guardar_caminatas_semana(st.session_state.semana_caminatas)
                 st.rerun()
-
-            # Gasto real del día
-            quema_dia_cam_el = nueva_h_el * quema_1h_el
-            quema_dia_cam_ella = nueva_h_ella * quema_1h_ella
-            gasto_real_dia_el = sed_el + quema_dia_cam_el
-            gasto_real_dia_ella = sed_ella + quema_dia_cam_ella
-
-            with cw3:
-                delta_el_cam = f"+{quema_dia_cam_el:.0f} kcal caminata ({nueva_h_el:.2f}h)" if nueva_h_el > 0 else "Descanso (0h caminata)"
-                st.metric("Gasto Real Hoy (Él)", f"{gasto_real_dia_el:.0f} kcal", delta_el_cam)
-            with cw4:
-                delta_ella_cam = f"+{quema_dia_cam_ella:.0f} kcal caminata ({nueva_h_ella:.2f}h)" if nueva_h_ella > 0 else "Descanso (0h caminata)"
-                st.metric("Gasto Real Hoy (Ella)", f"{gasto_real_dia_ella:.0f} kcal", delta_ella_cam)
 
             st.markdown("---")
 
@@ -1425,15 +1479,43 @@ with tab_sem:
     # Totales y Balance Semanal Acumulado
     st.markdown("---")
     st.markdown("#### 📊 Balance Metabólico Semanal Acumulado (7 Días)")
-    st.caption("Cálculo exacto: Suma el gasto real de cada día (según las horas caminadas ese día) frente al consumo real acumulado.")
+    st.caption("Cálculo exacto: Suma el gasto real de cada día (según horas de caminata o calorías de reloj inteligente) frente al consumo real acumulado.")
 
-    # Totales de caminata en la semana
-    total_h_cam_el = sum(st.session_state.semana_caminatas.get(d, {}).get("horas_el", 0.0) for d in DIAS_SEMANA)
-    total_h_cam_ella = sum(st.session_state.semana_caminatas.get(d, {}).get("horas_ella", 0.0) for d in DIAS_SEMANA)
+    # Totales de ejercicio y gasto en la semana
+    quema_dias_el = []
+    quema_dias_ella = []
+    horas_dias_el = []
+    horas_dias_ella = []
 
-    # Gasto real día por día
-    gastos_reales_el = [sed_el + (st.session_state.semana_caminatas.get(d, {}).get("horas_el", 0.0) * quema_1h_el) for d in DIAS_SEMANA]
-    gastos_reales_ella = [sed_ella + (st.session_state.semana_caminatas.get(d, {}).get("horas_ella", 0.0) * quema_1h_ella) for d in DIAS_SEMANA]
+    for d in DIAS_SEMANA:
+        c_dat = st.session_state.semana_caminatas.get(d, {})
+        m_el = c_dat.get("modo_el", "⏱️ Horas Caminadas (METs)")
+        if "Reloj" in m_el:
+            q_el = float(c_dat.get("kcal_el", 0.0))
+            h_el = round(q_el / quema_1h_el, 2) if quema_1h_el > 0 else 0.0
+        else:
+            h_el = float(c_dat.get("horas_el", 0.0))
+            q_el = h_el * quema_1h_el
+        quema_dias_el.append(q_el)
+        horas_dias_el.append(h_el)
+
+        m_ella = c_dat.get("modo_ella", "⏱️ Horas Caminadas (METs)")
+        if "Reloj" in m_ella:
+            q_ella = float(c_dat.get("kcal_ella", 0.0))
+            h_ella = round(q_ella / quema_1h_ella, 2) if quema_1h_ella > 0 else 0.0
+        else:
+            h_ella = float(c_dat.get("horas_ella", 0.0))
+            q_ella = h_ella * quema_1h_ella
+        quema_dias_ella.append(q_ella)
+        horas_dias_ella.append(h_ella)
+
+    total_quema_sem_el = sum(quema_dias_el)
+    total_quema_sem_ella = sum(quema_dias_ella)
+    total_h_cam_el = sum(horas_dias_el)
+    total_h_cam_ella = sum(horas_dias_ella)
+
+    gastos_reales_el = [sed_el + q for q in quema_dias_el]
+    gastos_reales_ella = [sed_ella + q for q in quema_dias_ella]
 
     gasto_sem_real_el = sum(gastos_reales_el)
     gasto_sem_real_ella = sum(gastos_reales_ella)
@@ -1461,7 +1543,7 @@ with tab_sem:
         with cb_1:
             st.metric("Consumo 7 Días", f"{total_sem_el_k:.0f} kcal", f"Prom: {(total_sem_el_k/7):.0f} kcal/día")
         with cb_2:
-            st.metric("Gasto Real 7 Días", f"{gasto_sem_real_el:.0f} kcal", f"🚶 {total_h_cam_el:.1f}h caminadas")
+            st.metric("Gasto Real 7 Días", f"{gasto_sem_real_el:.0f} kcal", f"🔥 +{total_quema_sem_el:.0f} kcal ejercicio")
         with cb_3:
             if neto_sem_el >= 50:
                 st.metric("Déficit Semanal Real", f"-{neto_sem_el:.0f} kcal", f"-{kg_sem_real_el:.2f} kg grasa")
@@ -1480,7 +1562,7 @@ with tab_sem:
         with cb_4:
             st.metric("Consumo 7 Días", f"{total_sem_ella_k:.0f} kcal", f"Prom: {(total_sem_ella_k/7):.0f} kcal/día")
         with cb_5:
-            st.metric("Gasto Real 7 Días", f"{gasto_sem_real_ella:.0f} kcal", f"🚶 {total_h_cam_ella:.1f}h caminadas")
+            st.metric("Gasto Real 7 Días", f"{gasto_sem_real_ella:.0f} kcal", f"🔥 +{total_quema_sem_ella:.0f} kcal ejercicio")
         with cb_6:
             if neto_sem_ella >= 50:
                 st.metric("Déficit Semanal Real", f"-{neto_sem_ella:.0f} kcal", f"-{kg_sem_real_ella:.2f} kg grasa")
@@ -1536,7 +1618,7 @@ with tab_sem:
     fig_sem.update_layout(
         barmode='group',
         template="plotly_dark",
-        title="Consumo Diario vs. Gasto Energético Real de Cada Día (según caminata)",
+        title="Consumo Diario vs. Gasto Energético Real de Cada Día (según actividad o reloj)",
         xaxis=dict(title="Día de la Semana"),
         yaxis=dict(title="Calorías (kcal)"),
         height=390,
@@ -1547,9 +1629,18 @@ with tab_sem:
 
     col_btn_sem1, col_btn_sem2 = st.columns([2, 3])
     with col_btn_sem1:
-        if st.button("🗑️ Reiniciar Semana Completa (Comidas y Caminatas)", key="btn_reset_semana", use_container_width=True):
+        if st.button("🗑️ Reiniciar Semana Completa (Comidas y Actividad)", key="btn_reset_semana", use_container_width=True):
             st.session_state.semana_alimentos = {d: [] for d in DIAS_SEMANA}
-            st.session_state.semana_caminatas = {d: {"horas_el": 0.0, "horas_ella": 0.0} for d in DIAS_SEMANA}
+            st.session_state.semana_caminatas = {
+                d: {
+                    "modo_el": "⏱️ Horas Caminadas (METs)",
+                    "horas_el": 0.0,
+                    "kcal_el": 0.0,
+                    "modo_ella": "⏱️ Horas Caminadas (METs)",
+                    "horas_ella": 0.0,
+                    "kcal_ella": 0.0
+                } for d in DIAS_SEMANA
+            }
             guardar_semana_alimentos(st.session_state.semana_alimentos)
             guardar_caminatas_semana(st.session_state.semana_caminatas)
             st.success("¡Semana reiniciada exitosamente!")
