@@ -1,30 +1,67 @@
 {
   "Lunes": {
-    "horas_el": 0.76,
-    "horas_ella": 0.0
+    "actividades_el": [
+      {
+        "id": "el_init_Lunes",
+        "nombre": "Reloj Inteligente",
+        "icono": "⌚",
+        "minutos": 55,
+        "kcal": 433.0,
+        "modo": "Reloj"
+      }
+    ],
+    "actividades_ella": [],
+    "horas_el": 0.92,
+    "kcal_el": 433.0,
+    "horas_ella": 0.0,
+    "kcal_ella": 0
   },
   "Martes": {
+    "actividades_el": [],
+    "actividades_ella": [],
     "horas_el": 0.0,
-    "horas_ella": 0.0
+    "kcal_el": 0,
+    "horas_ella": 0.0,
+    "kcal_ella": 0
   },
   "Miércoles": {
+    "actividades_el": [],
+    "actividades_ella": [],
     "horas_el": 0.0,
-    "horas_ella": 0.0
+    "kcal_el": 0,
+    "horas_ella": 0.0,
+    "kcal_ella": 0
   },
   "Jueves": {
+    "actividades_el": [],
+    "actividades_ella": [],
     "horas_el": 0.0,
-    "horas_ella": 0.0
+    "kcal_el": 0,
+    "horas_ella": 0.0,
+    "kcal_ella": 0
   },
   "Viernes": {
+    "actividades_el": [],
+    "actividades_ella": [],
     "horas_el": 0.0,
-    "horas_ella": 0.0
+    "kcal_el": 0,
+    "horas_ella": 0.0,
+    "kcal_ella": 0
   },
   "Sábado": {
+    "actividades_el": [],
+    "actividades_ella": [],
     "horas_el": 0.0,
-    "horas_ella": 0.0
+    "kcal_el": 0,
+    "horas_ella": 0.0,
+    "kcal_ella": 0
   },
   "Domingo": {
+    "actividades_el": [],
+    "actividades_ella": [],
     "horas_el": 0.0,
-    "horas_ella": 0.0
+    "kcal_el": 0,
+    "horas_ella": 0.0,
+    "kcal_ella": 0
   }
 }

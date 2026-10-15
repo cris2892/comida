@@ -281,6 +281,22 @@ ARCHIVO_SEMANA = "semana_alimentos.json"
 ARCHIVO_CAMINATAS_SEMANA = "semana_caminatas.json"
 DIAS_SEMANA = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
 
+# Catálogo completo de actividades físicas con valores METs estándar
+CATALOGO_ACTIVIDADES = {
+    "🚶 Caminata Paso Constante (4.0 METs)": {"mets": 4.0, "icono": "🚶", "nombre": "Caminata Paso Constante"},
+    "🚶‍♂️ Caminata Rápida (4.8 METs)": {"mets": 4.8, "icono": "🚶‍♂️", "nombre": "Caminata Rápida"},
+    "🚶‍♀️ Caminata Suave / Paseo (3.0 METs)": {"mets": 3.0, "icono": "🚶‍♀️", "nombre": "Caminata Suave"},
+    "🏋️ Musculación / Gimnasio / Pesas (4.5 METs)": {"mets": 4.5, "icono": "🏋️", "nombre": "Musculación / Pesas"},
+    "🚴 Ciclismo / Bicicleta (6.0 METs)": {"mets": 6.0, "icono": "🚴", "nombre": "Ciclismo / Bici"},
+    "🎾 Pádel / Tenis (6.0 METs)": {"mets": 6.0, "icono": "🎾", "nombre": "Pádel / Tenis"},
+    "🏃 Running / Trote (8.0 METs)": {"mets": 8.0, "icono": "🏃", "nombre": "Running / Trote"},
+    "🧘 Yoga / Pilates / Estiramiento (3.0 METs)": {"mets": 3.0, "icono": "🧘", "nombre": "Yoga / Pilates"},
+    "🏊 Natación Moderada (6.0 METs)": {"mets": 6.0, "icono": "🏊", "nombre": "Natación"},
+    "🥊 Boxeo / HIIT / Funcional (7.5 METs)": {"mets": 7.5, "icono": "🥊", "nombre": "HIIT / Funcional"},
+    "⌚ Actividad con Reloj Inteligente (kcal directas)": {"mets": 0.0, "icono": "⌚", "nombre": "Reloj Inteligente"},
+    "⚡ Otra Actividad Personalizada": {"mets": 4.0, "icono": "⚡", "nombre": "Otra Actividad"}
+}
+
 def cargar_semana_alimentos():
     base = {d: [] for d in DIAS_SEMANA}
     if os.path.exists(ARCHIVO_SEMANA):
@@ -305,10 +321,10 @@ def guardar_semana_alimentos(dict_semana):
 def cargar_caminatas_semana():
     base = {
         d: {
-            "modo_el": "⏱️ Horas Caminadas (METs)",
+            "actividades_el": [],
+            "actividades_ella": [],
             "horas_el": 0.0,
             "kcal_el": 0.0,
-            "modo_ella": "⏱️ Horas Caminadas (METs)",
             "horas_ella": 0.0,
             "kcal_ella": 0.0
         } for d in DIAS_SEMANA
@@ -319,13 +335,64 @@ def cargar_caminatas_semana():
                 data = json.load(f)
                 for d in DIAS_SEMANA:
                     if d in data:
+                        d_info = data[d]
+                        acts_el = d_info.get("actividades_el")
+                        acts_ella = d_info.get("actividades_ella")
+
+                        # Migración retrocompatible si el archivo guardado tiene el formato viejo
+                        if acts_el is None:
+                            acts_el = []
+                            h_old = float(d_info.get("horas_el", 0.0))
+                            k_old = float(d_info.get("kcal_el", 0.0))
+                            if k_old > 0:
+                                acts_el.append({
+                                    "id": f"el_init_{d}",
+                                    "nombre": "Reloj Inteligente",
+                                    "icono": "⌚",
+                                    "minutos": int(round((k_old / (4.0 * 119.0)) * 60)),
+                                    "kcal": round(k_old, 1),
+                                    "modo": "Reloj"
+                                })
+                            elif h_old > 0:
+                                acts_el.append({
+                                    "id": f"el_init_{d}",
+                                    "nombre": "Caminata",
+                                    "icono": "🚶",
+                                    "minutos": int(round(h_old * 60)),
+                                    "kcal": round(h_old * 4.0 * 119.0, 1),
+                                    "modo": "METs"
+                                })
+
+                        if acts_ella is None:
+                            acts_ella = []
+                            h_old_ella = float(d_info.get("horas_ella", 0.0))
+                            k_old_ella = float(d_info.get("kcal_ella", 0.0))
+                            if k_old_ella > 0:
+                                acts_ella.append({
+                                    "id": f"ella_init_{d}",
+                                    "nombre": "Reloj Inteligente",
+                                    "icono": "⌚",
+                                    "minutos": int(round((k_old_ella / (4.0 * 69.0)) * 60)),
+                                    "kcal": round(k_old_ella, 1),
+                                    "modo": "Reloj"
+                                })
+                            elif h_old_ella > 0:
+                                acts_ella.append({
+                                    "id": f"ella_init_{d}",
+                                    "nombre": "Caminata",
+                                    "icono": "🚶",
+                                    "minutos": int(round(h_old_ella * 60)),
+                                    "kcal": round(h_old_ella * 4.0 * 69.0, 1),
+                                    "modo": "METs"
+                                })
+
                         base[d] = {
-                            "modo_el": data[d].get("modo_el", "⏱️ Horas Caminadas (METs)"),
-                            "horas_el": float(data[d].get("horas_el", 0.0)),
-                            "kcal_el": float(data[d].get("kcal_el", 0.0)),
-                            "modo_ella": data[d].get("modo_ella", "⏱️ Horas Caminadas (METs)"),
-                            "horas_ella": float(data[d].get("horas_ella", 0.0)),
-                            "kcal_ella": float(data[d].get("kcal_ella", 0.0))
+                            "actividades_el": acts_el,
+                            "actividades_ella": acts_ella,
+                            "horas_el": round(sum(a.get("minutos", 0) for a in acts_el) / 60.0, 2),
+                            "kcal_el": round(sum(float(a.get("kcal", 0.0)) for a in acts_el), 1),
+                            "horas_ella": round(sum(a.get("minutos", 0) for a in acts_ella) / 60.0, 2),
+                            "kcal_ella": round(sum(float(a.get("kcal", 0.0)) for a in acts_ella), 1)
                         }
                 return base
         except Exception:
@@ -334,6 +401,14 @@ def cargar_caminatas_semana():
 
 def guardar_caminatas_semana(dict_caminatas):
     try:
+        for d in DIAS_SEMANA:
+            if d in dict_caminatas:
+                acts_el = dict_caminatas[d].get("actividades_el", [])
+                acts_ella = dict_caminatas[d].get("actividades_ella", [])
+                dict_caminatas[d]["horas_el"] = round(sum(a.get("minutos", 0) for a in acts_el) / 60.0, 2)
+                dict_caminatas[d]["kcal_el"] = round(sum(float(a.get("kcal", 0.0)) for a in acts_el), 1)
+                dict_caminatas[d]["horas_ella"] = round(sum(a.get("minutos", 0) for a in acts_ella) / 60.0, 2)
+                dict_caminatas[d]["kcal_ella"] = round(sum(float(a.get("kcal", 0.0)) for a in acts_ella), 1)
         with open(ARCHIVO_CAMINATAS_SEMANA, "w", encoding="utf-8") as f:
             json.dump(dict_caminatas, f, ensure_ascii=False, indent=2)
     except Exception as e:
@@ -1289,93 +1364,142 @@ with tab_sem:
     tabs_dias = st.tabs(DIAS_SEMANA)
     for i_dia, dia_nom in enumerate(DIAS_SEMANA):
         with tabs_dias[i_dia]:
-            # Registro de actividad / caminata de este día específico
+            # Registro de actividades de este día específico
             cam_data_dia = st.session_state.semana_caminatas.get(dia_nom, {})
-            m_guardado_el = cam_data_dia.get("modo_el", "⏱️ Horas Caminadas (METs)")
-            h_guardada_el = float(cam_data_dia.get("horas_el", 0.0))
-            k_guardada_el = float(cam_data_dia.get("kcal_el", 0.0))
+            acts_el = cam_data_dia.get("actividades_el", [])
+            acts_ella = cam_data_dia.get("actividades_ella", [])
 
-            m_guardado_ella = cam_data_dia.get("modo_ella", "⏱️ Horas Caminadas (METs)")
-            h_guardada_ella = float(cam_data_dia.get("horas_ella", 0.0))
-            k_guardada_ella = float(cam_data_dia.get("kcal_ella", 0.0))
+            quema_dia_el = sum(float(a.get("kcal", 0.0)) for a in acts_el)
+            minutos_dia_el = sum(int(a.get("minutos", 0)) for a in acts_el)
+            gasto_real_dia_el = sed_el + quema_dia_el
+
+            quema_dia_ella = sum(float(a.get("kcal", 0.0)) for a in acts_ella)
+            minutos_dia_ella = sum(int(a.get("minutos", 0)) for a in acts_ella)
+            gasto_real_dia_ella = sed_ella + quema_dia_ella
 
             st.markdown(f"""
             <div style="background: rgba(30, 41, 59, 0.45); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; padding: 12px 16px; margin-bottom: 14px;">
-                <div style="color: #38bdf8; font-weight: 700; font-size: 0.95rem; margin-bottom: 4px;">🏃 Actividad & Ejercicio Real de {dia_nom}</div>
-                <span style="font-size: 0.8rem; color: #94a3b8;">Elige cómo registrar la actividad de hoy: por <b>tiempo de caminata (cálculo científico METs)</b> o ingresando directo las <b>calorías quemadas según tu reloj inteligente (Apple Watch, Garmin, Galaxy Watch, etc.)</b>:</span>
+                <div style="color: #38bdf8; font-weight: 700; font-size: 0.95rem; margin-bottom: 4px;">🏃 Registro de Actividades & Ejercicio de {dia_nom}</div>
+                <span style="font-size: 0.8rem; color: #94a3b8;">Puedes registrar <b>varias actividades en un mismo día</b> (ej. caminata + gimnasio/pesas + bici) o ingresar las <b>calorías quemadas según tu reloj inteligente</b>. El sistema sumará el gasto metabólico total real.</span>
             </div>
             """, unsafe_allow_html=True)
 
-            col_act_el, col_act_ella = st.columns(2)
-            opciones_modo = ["⏱️ Horas Caminadas (METs)", "⌚ Calorías Reloj Inteligente (kcal)"]
+            # Formulario interactivo para registrar actividad en este día
+            with st.expander(f"➕ Registrar nueva actividad en {dia_nom}", expanded=(len(acts_el) == 0 and len(acts_ella) == 0)):
+                cf1, cf2, cf3 = st.columns([1.5, 2.5, 2.0])
+                with cf1:
+                    dest_act = st.selectbox("¿Quién la realizó?", ["👨 Solo Él", "👩 Solo Ella", "👫 Ambos (Juntos)"], key=f"dest_act_{dia_nom}")
+                with cf2:
+                    tipo_act_sel = st.selectbox("Tipo de Actividad", list(CATALOGO_ACTIVIDADES.keys()), key=f"tipo_act_{dia_nom}")
+                    act_info = CATALOGO_ACTIVIDADES[tipo_act_sel]
+                with cf3:
+                    modo_calc = st.radio("Método de Registro:", ["⏱️ Por Minutos (Fórmula METs)", "⌚ Por Calorías del Reloj (kcal directas)"], key=f"modo_calc_{dia_nom}")
 
-            with col_act_el:
-                st.markdown("<strong style='color: #60a5fa; font-size: 0.95rem;'>👨 Actividad de Él:</strong>", unsafe_allow_html=True)
-                idx_m_el = opciones_modo.index(m_guardado_el) if m_guardado_el in opciones_modo else 0
-                modo_sel_el = st.radio("Método (Él):", opciones_modo, index=idx_m_el, key=f"modo_act_el_{dia_nom}", horizontal=True)
+                nombre_final = act_info["nombre"]
+                icono_final = act_info["icono"]
+                mets_act = act_info["mets"]
 
-                if modo_sel_el == "⏱️ Horas Caminadas (METs)":
-                    nueva_h_el = st.number_input(
-                        f"Horas caminadas (Él)", min_value=0.0, max_value=12.0, value=h_guardada_el, step=0.25,
-                        key=f"cam_h_el_{dia_nom}",
-                        help="1.0 = 1h (60 min) | 0.5 = 30 min | 0.25 = 15 min"
-                    )
-                    quema_act_el = nueva_h_el * quema_1h_el
-                    nueva_k_el = 0.0
-                    label_quema_el = f"+{quema_act_el:.0f} kcal ({nueva_h_el:.2f}h METs)" if nueva_h_el > 0 else "Descanso (0h)"
+                if "Otra Actividad" in nombre_final:
+                    cf_extra1, cf_extra2 = st.columns([3, 1.5])
+                    with cf_extra1:
+                        nombre_final = st.text_input("Nombre de la Actividad", value="Entrenamiento", key=f"nom_custom_act_{dia_nom}")
+                    with cf_extra2:
+                        mets_act = st.number_input("Intensidad (METs)", min_value=1.0, max_value=16.0, value=4.5, step=0.5, key=f"mets_custom_{dia_nom}")
+
+                if "Minutos" in modo_calc:
+                    cm1, cm2 = st.columns([2, 3])
+                    with cm1:
+                        dur_min = st.number_input("Duración (minutos)", min_value=5, max_value=360, value=45, step=5, key=f"min_act_{dia_nom}", help="Ej: 45 min, 60 min, etc.")
+                    with cm2:
+                        quema_prev_el = (mets_act * peso_el * dur_min) / 60.0
+                        quema_prev_ella = (mets_act * peso_ella * dur_min) / 60.0
+                        prev_txt = []
+                        if dest_act in ["👨 Solo Él", "👫 Ambos (Juntos)"]:
+                            prev_txt.append(f"👨 Él: <b>+{quema_prev_el:.0f} kcal</b>")
+                        if dest_act in ["👩 Solo Ella", "👫 Ambos (Juntos)"]:
+                            prev_txt.append(f"👩 Ella: <b>+{quema_prev_ella:.0f} kcal</b>")
+                        st.markdown(f"<div style='font-size:0.8rem; color:#94a3b8; margin-top:24px;'>🔥 Quema estimada: {' | '.join(prev_txt)}</div>", unsafe_allow_html=True)
                 else:
-                    nueva_k_el = st.number_input(
-                        f"Calorías quemadas según Reloj (Él)", min_value=0.0, max_value=4000.0, value=k_guardada_el, step=10.0,
-                        key=f"cam_kcal_el_{dia_nom}",
-                        help="Ingresa el valor exacto de calorías activas mostrado en tu reloj inteligente."
-                    )
-                    quema_act_el = nueva_k_el
-                    nueva_h_el = round(nueva_k_el / quema_1h_el, 2) if quema_1h_el > 0 else 0.0
-                    label_quema_el = f"+{nueva_k_el:.0f} kcal (⌚ Reloj)" if nueva_k_el > 0 else "Descanso (0 kcal)"
+                    dur_min = st.number_input("Duración aprox. (minutos)", min_value=0, max_value=360, value=45, step=5, key=f"min_reloj_{dia_nom}", help="Opcional para registro de tiempo")
+                    if dest_act == "👨 Solo Él":
+                        kcal_in_el = st.number_input("Calorías activas del Reloj (Él)", min_value=1.0, max_value=4000.0, value=300.0, step=10.0, key=f"kcal_in_el_{dia_nom}")
+                    elif dest_act == "👩 Solo Ella":
+                        kcal_in_ella = st.number_input("Calorías activas del Reloj (Ella)", min_value=1.0, max_value=3000.0, value=200.0, step=10.0, key=f"kcal_in_ella_{dia_nom}")
+                    else:
+                        cr1, cr2 = st.columns(2)
+                        with cr1:
+                            kcal_in_el = st.number_input("Calorías Reloj (Él)", min_value=1.0, max_value=4000.0, value=300.0, step=10.0, key=f"kcal_in_el_ambos_{dia_nom}")
+                        with cr2:
+                            kcal_in_ella = st.number_input("Calorías Reloj (Ella)", min_value=1.0, max_value=3000.0, value=200.0, step=10.0, key=f"kcal_in_ella_ambos_{dia_nom}")
 
-                gasto_real_dia_el = sed_el + quema_act_el
-                st.metric("Gasto Real Hoy (Él)", f"{gasto_real_dia_el:.0f} kcal", label_quema_el)
+                if st.button(f"➕ Registrar Actividad en {dia_nom}", key=f"btn_add_act_{dia_nom}", use_container_width=True):
+                    ts_id = datetime.now().strftime("%H%M%S%f")
+                    if dest_act in ["👨 Solo Él", "👫 Ambos (Juntos)"]:
+                        k_calc_el = (mets_act * peso_el * dur_min / 60.0) if "Minutos" in modo_calc else float(kcal_in_el)
+                        st.session_state.semana_caminatas[dia_nom]["actividades_el"].append({
+                            "id": f"el_{ts_id}",
+                            "nombre": nombre_final,
+                            "icono": icono_final,
+                            "minutos": int(dur_min),
+                            "kcal": round(k_calc_el, 1),
+                            "modo": "METs" if "Minutos" in modo_calc else "Reloj"
+                        })
+                    if dest_act in ["👩 Solo Ella", "👫 Ambos (Juntos)"]:
+                        k_calc_ella = (mets_act * peso_ella * dur_min / 60.0) if "Minutos" in modo_calc else float(kcal_in_ella)
+                        st.session_state.semana_caminatas[dia_nom]["actividades_ella"].append({
+                            "id": f"ella_{ts_id}",
+                            "nombre": nombre_final,
+                            "icono": icono_final,
+                            "minutos": int(dur_min),
+                            "kcal": round(k_calc_ella, 1),
+                            "modo": "METs" if "Minutos" in modo_calc else "Reloj"
+                        })
+                    guardar_caminatas_semana(st.session_state.semana_caminatas)
+                    st.success("¡Actividad registrada correctamente!")
+                    st.rerun()
 
-            with col_act_ella:
-                st.markdown("<strong style='color: #f472b6; font-size: 0.95rem;'>👩 Actividad de Ella:</strong>", unsafe_allow_html=True)
-                idx_m_ella = opciones_modo.index(m_guardado_ella) if m_guardado_ella in opciones_modo else 0
-                modo_sel_ella = st.radio("Método (Ella):", opciones_modo, index=idx_m_ella, key=f"modo_act_ella_{dia_nom}", horizontal=True)
+            # Columnas con listado y métricas de actividades del día
+            col_v_el, col_v_ella = st.columns(2)
 
-                if modo_sel_ella == "⏱️ Horas Caminadas (METs)":
-                    nueva_h_ella = st.number_input(
-                        f"Horas caminadas (Ella)", min_value=0.0, max_value=12.0, value=h_guardada_ella, step=0.25,
-                        key=f"cam_h_ella_{dia_nom}",
-                        help="1.0 = 1h (60 min) | 0.5 = 30 min | 0.25 = 15 min"
-                    )
-                    quema_act_ella = nueva_h_ella * quema_1h_ella
-                    nueva_k_ella = 0.0
-                    label_quema_ella = f"+{quema_act_ella:.0f} kcal ({nueva_h_ella:.2f}h METs)" if nueva_h_ella > 0 else "Descanso (0h)"
+            with col_v_el:
+                st.markdown("<strong style='color: #60a5fa; font-size: 0.95rem;'>👨 Actividades de Él:</strong>", unsafe_allow_html=True)
+                label_el_act = f"+{quema_dia_el:.0f} kcal ({minutos_dia_el} min, {len(acts_el)} act.)" if quema_dia_el > 0 else "Descanso (0 kcal)"
+                st.metric("Gasto Real Hoy (Él)", f"{gasto_real_dia_el:.0f} kcal", label_el_act)
+
+                if acts_el:
+                    for idx_a, act in enumerate(acts_el):
+                        ca1, ca2, ca3 = st.columns([4.2, 3.8, 0.8])
+                        with ca1:
+                            st.markdown(f"{act.get('icono', '⚡')} **{act.get('nombre', 'Actividad')}**")
+                        with ca2:
+                            st.markdown(f"<span style='color:#38bdf8;'>⏱️ {act.get('minutos', 0)} min &nbsp;|&nbsp; 🔥 <b>{act.get('kcal', 0):.0f} kcal</b> <span style='font-size:0.75rem; color:#94a3b8;'>({act.get('modo', '')})</span></span>", unsafe_allow_html=True)
+                        with ca3:
+                            if st.button("❌", key=f"del_act_el_{dia_nom}_{idx_a}", help="Eliminar esta actividad"):
+                                st.session_state.semana_caminatas[dia_nom]["actividades_el"].pop(idx_a)
+                                guardar_caminatas_semana(st.session_state.semana_caminatas)
+                                st.rerun()
                 else:
-                    nueva_k_ella = st.number_input(
-                        f"Calorías quemadas según Reloj (Ella)", min_value=0.0, max_value=3000.0, value=k_guardada_ella, step=10.0,
-                        key=f"cam_kcal_ella_{dia_nom}",
-                        help="Ingresa el valor exacto de calorías activas mostrado en tu reloj inteligente."
-                    )
-                    quema_act_ella = nueva_k_ella
-                    nueva_h_ella = round(nueva_k_ella / quema_1h_ella, 2) if quema_1h_ella > 0 else 0.0
-                    label_quema_ella = f"+{nueva_k_ella:.0f} kcal (⌚ Reloj)" if nueva_k_ella > 0 else "Descanso (0 kcal)"
+                    st.caption("Día de descanso (sin actividades registradas)")
 
-                gasto_real_dia_ella = sed_ella + quema_act_ella
-                st.metric("Gasto Real Hoy (Ella)", f"{gasto_real_dia_ella:.0f} kcal", label_quema_ella)
+            with col_v_ella:
+                st.markdown("<strong style='color: #f472b6; font-size: 0.95rem;'>👩 Actividades de Ella:</strong>", unsafe_allow_html=True)
+                label_ella_act = f"+{quema_dia_ella:.0f} kcal ({minutos_dia_ella} min, {len(acts_ella)} act.)" if quema_dia_ella > 0 else "Descanso (0 kcal)"
+                st.metric("Gasto Real Hoy (Ella)", f"{gasto_real_dia_ella:.0f} kcal", label_ella_act)
 
-            # Persistir si hubo cambios en actividad
-            if (nueva_h_el != h_guardada_el or nueva_k_el != k_guardada_el or modo_sel_el != m_guardado_el or
-                nueva_h_ella != h_guardada_ella or nueva_k_ella != k_guardada_ella or modo_sel_ella != m_guardado_ella):
-                st.session_state.semana_caminatas[dia_nom] = {
-                    "modo_el": modo_sel_el,
-                    "horas_el": float(nueva_h_el),
-                    "kcal_el": float(nueva_k_el),
-                    "modo_ella": modo_sel_ella,
-                    "horas_ella": float(nueva_h_ella),
-                    "kcal_ella": float(nueva_k_ella)
-                }
-                guardar_caminatas_semana(st.session_state.semana_caminatas)
-                st.rerun()
+                if acts_ella:
+                    for idx_a, act in enumerate(acts_ella):
+                        ca1, ca2, ca3 = st.columns([4.2, 3.8, 0.8])
+                        with ca1:
+                            st.markdown(f"{act.get('icono', '⚡')} **{act.get('nombre', 'Actividad')}**")
+                        with ca2:
+                            st.markdown(f"<span style='color:#f472b6;'>⏱️ {act.get('minutos', 0)} min &nbsp;|&nbsp; 🔥 <b>{act.get('kcal', 0):.0f} kcal</b> <span style='font-size:0.75rem; color:#94a3b8;'>({act.get('modo', '')})</span></span>", unsafe_allow_html=True)
+                        with ca3:
+                            if st.button("❌", key=f"del_act_ella_{dia_nom}_{idx_a}", help="Eliminar esta actividad"):
+                                st.session_state.semana_caminatas[dia_nom]["actividades_ella"].pop(idx_a)
+                                guardar_caminatas_semana(st.session_state.semana_caminatas)
+                                st.rerun()
+                else:
+                    st.caption("Día de descanso (sin actividades registradas)")
 
             st.markdown("---")
 
@@ -1484,35 +1608,28 @@ with tab_sem:
     # Totales de ejercicio y gasto en la semana
     quema_dias_el = []
     quema_dias_ella = []
-    horas_dias_el = []
-    horas_dias_ella = []
+    minutos_dias_el = []
+    minutos_dias_ella = []
 
     for d in DIAS_SEMANA:
         c_dat = st.session_state.semana_caminatas.get(d, {})
-        m_el = c_dat.get("modo_el", "⏱️ Horas Caminadas (METs)")
-        if "Reloj" in m_el:
-            q_el = float(c_dat.get("kcal_el", 0.0))
-            h_el = round(q_el / quema_1h_el, 2) if quema_1h_el > 0 else 0.0
-        else:
-            h_el = float(c_dat.get("horas_el", 0.0))
-            q_el = h_el * quema_1h_el
-        quema_dias_el.append(q_el)
-        horas_dias_el.append(h_el)
+        acts_el_d = c_dat.get("actividades_el", [])
+        acts_ella_d = c_dat.get("actividades_ella", [])
 
-        m_ella = c_dat.get("modo_ella", "⏱️ Horas Caminadas (METs)")
-        if "Reloj" in m_ella:
-            q_ella = float(c_dat.get("kcal_ella", 0.0))
-            h_ella = round(q_ella / quema_1h_ella, 2) if quema_1h_ella > 0 else 0.0
-        else:
-            h_ella = float(c_dat.get("horas_ella", 0.0))
-            q_ella = h_ella * quema_1h_ella
+        q_el = sum(float(a.get("kcal", 0.0)) for a in acts_el_d)
+        m_el = sum(int(a.get("minutos", 0)) for a in acts_el_d)
+        quema_dias_el.append(q_el)
+        minutos_dias_el.append(m_el)
+
+        q_ella = sum(float(a.get("kcal", 0.0)) for a in acts_ella_d)
+        m_ella = sum(int(a.get("minutos", 0)) for a in acts_ella_d)
         quema_dias_ella.append(q_ella)
-        horas_dias_ella.append(h_ella)
+        minutos_dias_ella.append(m_ella)
 
     total_quema_sem_el = sum(quema_dias_el)
     total_quema_sem_ella = sum(quema_dias_ella)
-    total_h_cam_el = sum(horas_dias_el)
-    total_h_cam_ella = sum(horas_dias_ella)
+    total_h_cam_el = sum(minutos_dias_el) / 60.0
+    total_h_cam_ella = sum(minutos_dias_ella) / 60.0
 
     gastos_reales_el = [sed_el + q for q in quema_dias_el]
     gastos_reales_ella = [sed_ella + q for q in quema_dias_ella]
@@ -1543,7 +1660,7 @@ with tab_sem:
         with cb_1:
             st.metric("Consumo 7 Días", f"{total_sem_el_k:.0f} kcal", f"Prom: {(total_sem_el_k/7):.0f} kcal/día")
         with cb_2:
-            st.metric("Gasto Real 7 Días", f"{gasto_sem_real_el:.0f} kcal", f"🔥 +{total_quema_sem_el:.0f} kcal ejercicio")
+            st.metric("Gasto Real 7 Días", f"{gasto_sem_real_el:.0f} kcal", f"🔥 +{total_quema_sem_el:.0f} kcal ({total_h_cam_el:.1f}h)")
         with cb_3:
             if neto_sem_el >= 50:
                 st.metric("Déficit Semanal Real", f"-{neto_sem_el:.0f} kcal", f"-{kg_sem_real_el:.2f} kg grasa")
@@ -1562,7 +1679,7 @@ with tab_sem:
         with cb_4:
             st.metric("Consumo 7 Días", f"{total_sem_ella_k:.0f} kcal", f"Prom: {(total_sem_ella_k/7):.0f} kcal/día")
         with cb_5:
-            st.metric("Gasto Real 7 Días", f"{gasto_sem_real_ella:.0f} kcal", f"🔥 +{total_quema_sem_ella:.0f} kcal ejercicio")
+            st.metric("Gasto Real 7 Días", f"{gasto_sem_real_ella:.0f} kcal", f"🔥 +{total_quema_sem_ella:.0f} kcal ({total_h_cam_ella:.1f}h)")
         with cb_6:
             if neto_sem_ella >= 50:
                 st.metric("Déficit Semanal Real", f"-{neto_sem_ella:.0f} kcal", f"-{kg_sem_real_ella:.2f} kg grasa")
@@ -1633,10 +1750,10 @@ with tab_sem:
             st.session_state.semana_alimentos = {d: [] for d in DIAS_SEMANA}
             st.session_state.semana_caminatas = {
                 d: {
-                    "modo_el": "⏱️ Horas Caminadas (METs)",
+                    "actividades_el": [],
+                    "actividades_ella": [],
                     "horas_el": 0.0,
                     "kcal_el": 0.0,
-                    "modo_ella": "⏱️ Horas Caminadas (METs)",
                     "horas_ella": 0.0,
                     "kcal_ella": 0.0
                 } for d in DIAS_SEMANA

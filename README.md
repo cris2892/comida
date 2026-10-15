@@ -23,12 +23,16 @@ Plataforma analítica e interactiva desarrollada con **Streamlit** y **Plotly**,
 * **Planificación Día a Día:** Pestañas dedicadas para cada día de la semana (Lunes a Domingo).
 * **Carga Rápida:** Asigna comidas completas desde la Olla Compartida o agrega snacks/alimentos individuales para *Solo Él*, *Solo Ella* o *Ambos*.
 * **Control Detallado:** Lista por día con calorías, proteínas, carbohidratos, grasas y botón `❌` para eliminar ítems específicos.
-* **🏃/⌚ Registro Diario de Ejercicio & Reloj Inteligente:** Permite registrar la actividad física diaria de dos formas independientes para Él y para Ella:
-  * **⏱️ Horas Caminadas (METs):** Calcula la quema calórica exacta según el peso corporal y la duración ($METs \times peso \times horas$).
-  * **⌚ Calorías de Reloj Inteligente (kcal):** Permite ingresar directamente las calorías activas medidas por tu smartwatch (Apple Watch, Garmin, Xiaomi, Fitbit, Samsung Galaxy Watch, etc.).
-  * El sistema calcula el **Gasto Calórico Real del día** (Gasto Base en descanso + Quema activa) y actualiza automáticamente el balance neto diario.
-* **Balance Diario y Semanal Real:** Muestra el déficit o superávit neto real de cada día y de los 7 días completos sumando el gasto real según los días activos frente al consumo acumulado.
-* **Gráfica Comparativa:** Barras de ingesta diaria vs. curvas de gasto real diario de cada uno (que ascienden en días activos y bajan en días de descanso) y líneas de meta diaria.
+* **🏃/⌚ Gestor de Múltiples Actividades Físicas por Día:**
+  * **Múltiples sesiones diarias:** Permite registrar todas las actividades que realices en el día (ej: Caminata matutina + Sesión de Gimnasio/Pesas + Partido de Pádel o Bici).
+  * **Catálogo de Ejercicios Integrado:** Incluye caminata paso constante/ligero/rápido, musculación/gimnasio, ciclismo, running, pádel/tenis, natación, yoga/pilates, funcional/HIIT y actividades personalizadas.
+  * **Doble Modo de Registro:**
+    * **⏱️ Por Minutos (Fórmulas METs):** Calcula la quema calórica exacta en tiempo real según el peso corporal del usuario ($METs \times peso \times \frac{min}{60}$).
+    * **⌚ Por Calorías de Reloj Inteligente (kcal directas):** Ingreso manual del gasto calórico activo exacto reportado por tu smartwatch (Apple Watch, Garmin, Xiaomi, Fitbit, Galaxy Watch, etc.).
+  * **Asignación Flexible:** Carga actividades para *Solo Él*, *Solo Ella* o para *Ambos (juntos)* con cálculo simultáneo adaptado al peso de cada uno.
+  * **Gestión Visual:** Lista con badges, minutos, calorías quemadas y botón `❌` para eliminar actividades individuales.
+* **Balance Diario y Semanal Real:** Suma el gasto base en reposo más todas las actividades registradas del día, calculando el balance neto diario y acumulado de 7 días.
+* **Gráfica Comparativa Dinámica:** Barras de ingesta calórica vs. líneas de gasto real diario (que se elevan en función de la cantidad e intensidad de actividades registradas) y líneas de meta diaria.
 
 ### 3. 🔥 Auditoría Metabólica & Simulador de Caminatas
 * **Fórmulas Científicas:**
