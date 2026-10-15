@@ -769,11 +769,12 @@ st.markdown(
 # ==============================================================================
 # TABS PRINCIPALES
 # ==============================================================================
-tab1, tab_sem, tab2, tab3 = st.tabs([
+tab1, tab_sem, tab2, tab3, tab4 = st.tabs([
     "🧮 Calculadora de Alimentos & Armador de Platos",
     "📅 Registro & Balance Semanal (Lunes a Domingo)",
     "🔥 Auditoría Metabólica & Simulador de Caminatas",
-    "📈 Registro de Peso y Avance Real"
+    "📈 Registro de Peso y Avance Real",
+    "📚 Guía Metabólica & Glosario Nutricional"
 ])
 
 # ==============================================================================
@@ -2409,3 +2410,675 @@ with tab3:
 
     else:
         st.info("No hay pesajes guardados todavía. Usa el formulario de arriba para cargar tu primer registro.")
+
+# ==============================================================================
+# PESTAÑA 5: GUÍA METABÓLICA, GLOSARIO Y CHULETA NUTRICIONAL
+# ==============================================================================
+with tab4:
+    st.markdown("### 📚 Guía Metabólica, Glosario & Manual de Bolsillo")
+    st.markdown(
+        "Tu manual de cabecera: el rol de cada macro, cómo calcular lo que comes (crudo vs. cocido), "
+        "estrategias para comer juntos con metas distintas, la regla de la mano para comer afuera, trampas ocultas y fórmulas metabólicas."
+    )
+
+    tab_g1, tab_g2, tab_g3, tab_g4, tab_g5, tab_g6 = st.tabs([
+        "🧬 1. Rol de Macros & Calculadora g/kg",
+        "🧮 2. Cálculo de Macros & Crudo vs. Cocido",
+        "👫 3. Comer en Pareja con Metas Distintas",
+        "📋 4. La Chuleta & Regla de la Mano",
+        "🚨 5. Trampas Ocultas, Agua & Sal",
+        "🔬 6. Fórmulas Metabólicas & Dudas Frecuentes"
+    ])
+
+    # --------------------------------------------------------------------------
+    # SUB-PESTAÑA 1: EL ROL REAL DE CADA MACRONUTRIENTE & CALCULADORA G/KG
+    # --------------------------------------------------------------------------
+    with tab_g1:
+        st.markdown("#### 🧬 ¿Para qué sirve realmente cada macro y qué pasa si falta o sobra?")
+        
+        c_m_p, c_m_c, c_m_g = st.columns(3)
+        
+        with c_m_p:
+            st.markdown("""
+            <div style="background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 12px; padding: 16px; height: 100%;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <span class="badge-p"><b>🍗 PROTEÍNAS</b></span>
+                    <span style="color: #60a5fa; font-weight: 700; font-size: 0.9rem;">4 kcal / gramo</span>
+                </div>
+                <h5 style="color: #60a5fa; margin-top: 0;">El Blindaje Muscular y la Saciedad</h5>
+                <p style="font-size: 0.82rem; color: #cbd5e1; line-height: 1.5;">
+                    <b>¿Qué hace en tu cuerpo?</b><br>
+                    Son los "ladrillos" de la masa muscular, órganos, hormonas péptidas, anticuerpos y enzimas.
+                </p>
+                <p style="font-size: 0.82rem; color: #cbd5e1; line-height: 1.5;">
+                    <b>🔥 Efecto Térmico (TEF): 20% a 30%</b><br>
+                    Es el macronutriente más "costoso" de digerir. De cada 100 kcal de proteína que ingieres, tu cuerpo quema hasta 30 kcal solo en procesarla.
+                </p>
+                <p style="font-size: 0.82rem; color: #cbd5e1; line-height: 1.5;">
+                    <b>🛡️ En Déficit Calórico:</b><br>
+                    Cuando comes menos calorías de las que gastas, tu cuerpo busca energía en cualquier parte. Si tu proteína es alta (1.6 a 2.0g/kg), <b>blindas el músculo y obligas a tu organismo a quemar grasa corporal</b>.
+                </p>
+                <p style="font-size: 0.82rem; color: #94a3b8; line-height: 1.5;">
+                    <b style="color: #f87171;">⚠️ Si te falta:</b> Pierdes masa muscular, se ralentiza el metabolismo basal, sientes hambre constante y fatiga.<br>
+                    <b style="color: #34d399;">✅ Si te pasas un poco:</b> Muy difícilmente se acumula como grasa debido a su alto costo metabólico; simplemente aporta saciedad extra.
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
+
+        with c_m_c:
+            st.markdown("""
+            <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 12px; padding: 16px; height: 100%;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <span class="badge-c"><b>🍞 CARBOHIDRATOS</b></span>
+                    <span style="color: #34d399; font-weight: 700; font-size: 0.9rem;">4 kcal / gramo</span>
+                </div>
+                <h5 style="color: #34d399; margin-top: 0;">El Combustible y la Salud Tiroidea</h5>
+                <p style="font-size: 0.82rem; color: #cbd5e1; line-height: 1.5;">
+                    <b>¿Qué hace en tu cuerpo?</b><br>
+                    Es la fuente primaria de glucosa para el cerebro, el sistema nervioso central y los depósitos de glucógeno en músculos e hígado.
+                </p>
+                <p style="font-size: 0.82rem; color: #cbd5e1; line-height: 1.5;">
+                    <b>🦋 Tiroides y Leptina (Evitar estancarse):</b><br>
+                    Eliminar los carbos a cero durante mucho tiempo reduce la conversión de hormona tiroidea T4 a T3 activa y deprime la leptina (hormona de saciedad y ritmo metabólico). Mantener carbohidratos adecuados le dice al cerebro: <i>"No hay hambruna, puedes seguir quemando grasa"</i>.
+                </p>
+                <p style="font-size: 0.82rem; color: #cbd5e1; line-height: 1.5;">
+                    <b>💧 El Mito del Peso Rápido:</b><br>
+                    Cada 1g de glucógeno almacenado retiene 3 a 4g de agua intracelular. Si comes más carbos hoy, mañana la balanza puede subir 500g-1kg: <b>es agua muscular, no grasa</b>.
+                </p>
+                <p style="font-size: 0.82rem; color: #94a3b8; line-height: 1.5;">
+                    <b style="color: #f87171;">⚠️ Si te faltan:</b> Entrenamientos débiles, cansancio en las caminatas, mal humor, niebla mental y atracones nocturnos.<br>
+                    <b style="color: #34d399;">✅ Si te pasas:</b> Se llenan los depósitos de glucógeno; solo se almacena en grasa si superas tus calorías totales del día.
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
+
+        with c_m_g:
+            st.markdown("""
+            <div style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 12px; padding: 16px; height: 100%;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <span class="badge-g"><b>🥑 GRASAS</b></span>
+                    <span style="color: #fbbf24; font-weight: 700; font-size: 0.9rem;">9 kcal / gramo</span>
+                </div>
+                <h5 style="color: #fbbf24; margin-top: 0;">El Eje Hormonal y Celular Vital</h5>
+                <p style="font-size: 0.82rem; color: #cbd5e1; line-height: 1.5;">
+                    <b>¿Qué hace en tu cuerpo?</b><br>
+                    Son indispensables para sintetizar hormonas esteroideas (testosterona en él; estrógenos y progesterona en ella), mantener las membranas de cada célula y absorber vitaminas liposolubles (A, D, E, K).
+                </p>
+                <p style="font-size: 0.82rem; color: #cbd5e1; line-height: 1.5;">
+                    <b>🚨 Piso Mínimo de Seguridad:</b><br>
+                    <b>Nunca bajar de 0.6g a 0.7g por kg de peso.</b> Cortar las grasas para "ahorrar calorías" desregula el ciclo menstrual en mujeres, reduce la testosterona y libido en hombres y arruina la calidad del sueño.
+                </p>
+                <p style="font-size: 0.82rem; color: #cbd5e1; line-height: 1.5;">
+                    <b>⚖️ Alta Densidad Calórica:</b><br>
+                    Tienen 9 kcal/g (más del doble que proteínas y carbos). Una cucharada sopera de aceite (14g) suma 126 kcal casi invisibles. Medirlas con balanza marca la diferencia.
+                </p>
+                <p style="font-size: 0.82rem; color: #94a3b8; line-height: 1.5;">
+                    <b style="color: #f87171;">⚠️ Si te faltan:</b> Desbalances hormonales, piel seca, caída de cabello, dificultad para dormir y desánimo.<br>
+                    <b style="color: #34d399;">✅ Si te pasas:</b> Es el macronutriente que el cuerpo almacena con mayor eficiencia energética si estás en superávit calórico.
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
+
+        st.markdown("---")
+        st.markdown("#### 🎯 ¿Cuánto de cada cosa debería tener mi dieta diaria?")
+        st.markdown(
+            "En nutrición deportiva moderna, tu plato diario no se diseña al azar ni con porcentajes mágicos; "
+            "se construye siguiendo un **orden estricto de 3 pasos por prioridad biológica** basado en **Gramos por Kilo (g/kg)**:"
+        )
+
+        st.markdown("""
+        <div style="display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 200px; background: rgba(59, 130, 246, 0.12); border: 1px solid rgba(59, 130, 246, 0.35); border-radius: 10px; padding: 12px;">
+                <div style="font-weight: 700; color: #60a5fa; font-size: 0.95rem;">PASO 1: 🍗 Fijar la Proteína</div>
+                <div style="font-size: 0.8rem; color: #cbd5e1; margin-top: 4px;">
+                    Es lo <b>no negociable</b>. Protege tu masa muscular del catabolismo en déficit y da saciedad.
+                </div>
+            </div>
+            <div style="flex: 1; min-width: 200px; background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.35); border-radius: 10px; padding: 12px;">
+                <div style="font-weight: 700; color: #fbbf24; font-size: 0.95rem;">PASO 2: 🥑 Fijar la Grasa Mínima</div>
+                <div style="font-size: 0.8rem; color: #cbd5e1; margin-top: 4px;">
+                    Es el <b>piso hormonal vital</b>. Nunca bajar de 0.6g/kg para cuidar tiroides, testosterona y estrógenos.
+                </div>
+            </div>
+            <div style="flex: 1; min-width: 200px; background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 10px; padding: 12px;">
+                <div style="font-weight: 700; color: #34d399; font-size: 0.95rem;">PASO 3: 🍞 Carbohidratos (El Resto)</div>
+                <div style="font-size: 0.8rem; color: #cbd5e1; margin-top: 4px;">
+                    Son el <b>combustible flexible</b>. Todas las calorías que sobren de tu presupuesto van a los carbos para rendir.
+                </div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        col_gkg1, col_gkg2 = st.columns([1.1, 0.9])
+        with col_gkg1:
+            st.markdown("""
+            <div style="background: rgba(30, 41, 59, 0.65); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 16px;">
+                <h5 style="color: #38bdf8; margin-top: 0;">⚖️ ¿Qué significa exactamente "Gramos por Kilo" (g/kg)?</h5>
+                <p style="font-size: 0.84rem; color: #cbd5e1; line-height: 1.5;">
+                    Significa: <i>"Por cada 1 kilogramo que pesa tu cuerpo, necesitas ingerir X cantidad de gramos de ese nutriente en el día"</i>.
+                </p>
+                <div style="background: rgba(15, 23, 42, 0.85); border-left: 3px solid #38bdf8; padding: 8px 12px; font-family: monospace; font-size: 0.9rem; color: #f8fafc; margin: 8px 0;">
+                    Gramos Diarios = Kilos de Peso × Multiplicador (g/kg)
+                </div>
+                <p style="font-size: 0.82rem; color: #cbd5e1; line-height: 1.5;">
+                    <b>¿Por qué es superior a los porcentajes fijos?</b><br>
+                    Si alguien recorta calorías a 1.200 kcal y come "30% proteína", comería solo 90g de proteína (¡insuficiente para un adulto!).
+                    El método de <b>gramos por kilo asegura la masa biológica que tus órganos y músculos necesitan sí o sí</b>, sin importar cuánto bajes las calorías totales.
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
+
+        with col_gkg2:
+            st.markdown("""
+            <div style="background: rgba(30, 41, 59, 0.65); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 16px;">
+                <h5 style="color: #ec4899; margin-top: 0;">💡 El "Secreto" del Peso Magro / Peso Objetivo</h5>
+                <p style="font-size: 0.84rem; color: #cbd5e1; line-height: 1.5;">
+                    <b>La grasa acumulada no demanda proteína</b>; quienes la necesitan son tus músculos, órganos, huesos y sangre.
+                </p>
+                <p style="font-size: 0.82rem; color: #cbd5e1; line-height: 1.5;">
+                    Por eso, cuando se busca perder peso, la ciencia multiplica sobre el <b>Peso Objetivo o Peso Magro</b> para no inflar números innecesariamente:
+                </p>
+                <ul style="font-size: 0.8rem; color: #cbd5e1; line-height: 1.5;">
+                    <li>👨 <b>En tu caso (Él):</b> Peso actual ~119 kg. Peso objetivo magro ~94 kg.<br>
+                    👉 <code>94 kg × 2.0 g/kg = 188g de Proteína</code> (¡La meta de la app!).</li>
+                    <li>👩 <b>En el caso de Ella:</b> Peso actual ~69 kg. Peso objetivo magro ~58-60 kg.<br>
+                    👉 <code>59 kg × 2.0 g/kg = 118g de Proteína</code> (¡Sus 115g-125g en la app!).</li>
+                </ul>
+            </div>
+            """, unsafe_allow_html=True)
+
+        # CALCULADORA INTERACTIVA DE GRAMOS POR KILO EN VIVO
+        with st.expander("🧮 Calculadora Interactiva de Gramos por Kilo en Vivo (Prueba tus propios números)", expanded=True):
+            st.markdown("Simula cualquier peso y multiplicadores para ver cómo se distribuyen tus calorías exactas:")
+            
+            col_calc_sel, col_calc_p = st.columns([1.5, 1.5])
+            with col_calc_sel:
+                per_calc_sel = st.radio("Cargar valores predeterminados de:", ["👨 Perfil Él (Base 94 kg magro)", "👩 Perfil Ella (Base 59 kg magro)", "🛠️ Personalizado"], horizontal=True, key="rad_calc_gkg")
+            
+            if "Él" in per_calc_sel:
+                peso_init_calc = 94.0
+                kcal_init_calc = 2150.0
+                p_mult_init = 2.0
+                g_mult_init = 0.65
+            elif "Ella" in per_calc_sel:
+                peso_init_calc = 59.0
+                kcal_init_calc = 1350.0
+                p_mult_init = 2.0
+                g_mult_init = 0.65
+            else:
+                peso_init_calc = 75.0
+                kcal_init_calc = 1800.0
+                p_mult_init = 1.8
+                g_mult_init = 0.8
+
+            with col_calc_p:
+                peso_sim_gkg = st.number_input("Peso de Referencia (kg):", min_value=30.0, max_value=160.0, value=peso_init_calc, step=1.0, key="num_peso_sim_gkg")
+
+            c_sl1, c_sl2, c_sl3 = st.columns(3)
+            with c_sl1:
+                mult_p = st.slider("Proteína (g/kg):", min_value=1.2, max_value=2.4, value=p_mult_init, step=0.1, key="sl_mult_p")
+            with c_sl2:
+                mult_g = st.slider("Grasa (g/kg):", min_value=0.5, max_value=1.2, value=g_mult_init, step=0.05, key="sl_mult_g")
+            with c_sl3:
+                kcal_presupuesto = st.number_input("Presupuesto Diario (kcal):", min_value=1000.0, max_value=4500.0, value=kcal_init_calc, step=50.0, key="num_kcal_presupuesto")
+
+            # Cálculo en vivo
+            gr_prot_calc = peso_sim_gkg * mult_p
+            kcal_prot_calc = gr_prot_calc * 4.0
+
+            gr_grasa_calc = peso_sim_gkg * mult_g
+            kcal_grasa_calc = gr_grasa_calc * 9.0
+
+            kcal_restantes = max(0.0, kcal_presupuesto - (kcal_prot_calc + kcal_grasa_calc))
+            gr_carbo_calc = kcal_restantes / 4.0
+
+            pct_p = (kcal_prot_calc / kcal_presupuesto) * 100.0 if kcal_presupuesto > 0 else 0
+            pct_g = (kcal_grasa_calc / kcal_presupuesto) * 100.0 if kcal_presupuesto > 0 else 0
+            pct_c = (kcal_restantes / kcal_presupuesto) * 100.0 if kcal_presupuesto > 0 else 0
+
+            st.markdown(f"""
+            <div style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
+                <div class="metric-card" style="flex: 1; min-width: 130px; text-align: center; border-left: 3px solid #3b82f6;">
+                    <div class="metric-title" style="color: #60a5fa;">🍗 Proteína</div>
+                    <div class="metric-val" style="color: #60a5fa;">{gr_prot_calc:.0f} g</div>
+                    <div class="metric-sub">{kcal_prot_calc:.0f} kcal ({pct_p:.0f}%)</div>
+                </div>
+                <div class="metric-card" style="flex: 1; min-width: 130px; text-align: center; border-left: 3px solid #f59e0b;">
+                    <div class="metric-title" style="color: #fbbf24;">🥑 Grasas</div>
+                    <div class="metric-val" style="color: #fbbf24;">{gr_grasa_calc:.0f} g</div>
+                    <div class="metric-sub">{kcal_grasa_calc:.0f} kcal ({pct_g:.0f}%)</div>
+                </div>
+                <div class="metric-card" style="flex: 1; min-width: 130px; text-align: center; border-left: 3px solid #10b981;">
+                    <div class="metric-title" style="color: #34d399;">🍞 Carbohidratos</div>
+                    <div class="metric-val" style="color: #34d399;">{gr_carbo_calc:.0f} g</div>
+                    <div class="metric-sub">{kcal_restantes:.0f} kcal ({pct_c:.0f}%)</div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+
+        st.markdown("##### 📋 Tabla de Escala Oficial: ¿Cuánto comer de cada cosa según tu meta?")
+        datos_escala = [
+            {"Macronutriente": "🍗 Proteína", "Rango en Déficit (Pérdida de Grasa)": "1.6 a 2.0 g/kg (o ~2.0 g/kg de peso objetivo)", "Rango Mantenimiento / Normal": "1.2 a 1.6 g/kg", "% Calórico Típico": "30% a 35%", "Motivo Biológico": "En déficit sube para frenar la pérdida de músculo y apagar el hambre."},
+            {"Macronutriente": "🥑 Grasas", "Rango en Déficit (Pérdida de Grasa)": "0.6 a 0.8 g/kg (Piso mínimo)", "Rango Mantenimiento / Normal": "0.8 a 1.2 g/kg", "% Calórico Típico": "20% a 28%", "Motivo Biológico": "Se reduce para ahorrar calorías pero nunca por debajo del 20% para no frenar hormonas."},
+            {"Macronutriente": "🍞 Carbohidratos", "Rango en Déficit (Pérdida de Grasa)": "2.0 a 3.0 g/kg (El resto de calorías)", "Rango Mantenimiento / Normal": "3.5 a 5.0 g/kg", "% Calórico Típico": "40% a 48%", "Motivo Biológico": "Es la variable de ajuste: se reducen para generar el déficit pero se mantienen para tener energía."}
+        ]
+        st.dataframe(pd.DataFrame(datos_escala), use_container_width=True, hide_index=True)
+
+    # --------------------------------------------------------------------------
+    # SUB-PESTAÑA 2: CÓMO CALCULAR LOS MACROS DE UN ALIMENTO
+    # --------------------------------------------------------------------------
+    with tab_g2:
+        st.markdown("#### 🧮 Cómo Calcular los Macros de Cualquier Alimento")
+        st.markdown(
+            "El error más común es confundir el **peso del alimento en la balanza** con la **cantidad de nutriente puro**. "
+            "Aprende a calcularlo en segundos con la fórmula universal y entiende la diferencia clave entre pesado en crudo vs. cocido."
+        )
+
+        col_calc_teo, col_calc_int = st.columns([1.2, 1.0])
+
+        with col_calc_teo:
+            st.markdown("""
+            <div style="background: rgba(30, 41, 59, 0.6); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 16px; margin-bottom: 14px;">
+                <h5 style="color: #38bdf8; margin-top: 0;">📐 La Fórmula Universal (Regla de Tres)</h5>
+                <p style="font-size: 0.85rem; color: #cbd5e1;">
+                    Todas las tablas nutricionales de los paquetes informan los valores <b>por cada 100 gramos</b>. Para calcular tu porción real pesada:
+                </p>
+                <div style="background: rgba(15, 23, 42, 0.8); border-left: 3px solid #38bdf8; padding: 10px 14px; border-radius: 6px; font-family: monospace; font-size: 0.95rem; color: #f8fafc; margin: 10px 0;">
+                    Macro Real (g) = (Gramos Pesados ÷ 100) × Valor en la Tabla
+                </div>
+                <p style="font-size: 0.82rem; color: #94a3b8;">
+                    <b>Ejemplo Práctico con Arroz Crudo:</b><br>
+                    • La etiqueta dice que cada 100g de arroz tiene <b>78g de carbohidratos</b>.<br>
+                    • Si pones en tu balanza <b>65 gramos de arroz</b>:<br>
+                    👉 <code>(65 ÷ 100) × 78 = 50.7g de Carbohidratos</code>
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
+
+        with col_calc_int:
+            st.markdown("""
+            <div style="background: rgba(30, 41, 59, 0.6); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 16px; margin-bottom: 14px;">
+                <h5 style="color: #38bdf8; margin-top: 0;">🧪 Simulador Rápido de Etiqueta</h5>
+                <span style="font-size: 0.8rem; color: #94a3b8;">Prueba con cualquier alimento de tu alacena:</span>
+            </div>
+            """, unsafe_allow_html=True)
+            gr_test = st.number_input("Gramos que pesas en tu plato (g):", min_value=1.0, max_value=2000.0, value=75.0, step=5.0, key="calc_gr_test")
+            v100_test = st.number_input("Valor en la etiqueta cada 100g:", min_value=0.0, max_value=100.0, value=78.0, step=1.0, key="calc_v100_test", help="Ej: 78g de carbohidratos en arroz o 22g de proteína en pollo")
+            
+            res_macro = (gr_test / 100.0) * v100_test
+            st.markdown(f"""
+            <div style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); border-radius: 8px; padding: 12px; text-align: center; margin-top: 10px;">
+                <span style="font-size: 0.8rem; color: #94a3b8;">Aporte real a tu cuerpo:</span>
+                <div style="font-size: 1.6rem; font-weight: 700; color: #60a5fa;">{res_macro:.1f} gramos</div>
+                <span style="font-size: 0.78rem; color: #cbd5e1;">({gr_test:.0f}g pesados ÷ 100) × {v100_test:.1f}g = {res_macro:.1f}g</span>
+            </div>
+            """, unsafe_allow_html=True)
+
+        st.markdown("---")
+        st.markdown("#### ⚠️ El Gran Cambio: Alimento Crudo vs. Alimento Cocido")
+        st.markdown(
+            "El agua no tiene calorías ni macronutrientes, pero altera drásticamente el peso de la balanza. "
+            "Existen dos grandes familias de alimentos según cómo se comportan al cocinarse:"
+        )
+
+        col_fam1, col_fam2 = st.columns(2)
+        with col_fam1:
+            st.markdown("""
+            <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 10px; padding: 16px;">
+                <h5 style="color: #34d399; margin-top: 0;">1. Los que ABSORBEN agua (Arroz, Fideos, Legumbres, Avena)</h5>
+                <p style="font-size: 0.84rem; color: #cbd5e1; line-height: 1.5;">
+                    Al hervirse, absorben entre <b>2.5 a 3 veces su peso en agua</b>. El contenido de carbohidratos no cambia, pero se diluye en más peso:
+                </p>
+                <ul style="font-size: 0.82rem; color: #cbd5e1; line-height: 1.6;">
+                    <li><b>100g de Arroz Crudo:</b> Tiene <b>78g de Carbos</b> y 350 kcal.</li>
+                    <li>Al cocinarlo, esos 100g absorben agua y se convierten en <b>~260g de Arroz Cocido</b>.</li>
+                    <li>¡Esos 260g siguen teniendo los mismos 78g de carbos!</li>
+                    <li>Por lo tanto, <b>100g de Arroz ya Cocido solo tienen ~28g a 30g de Carbos</b> (~130 kcal).</li>
+                </ul>
+                <div style="background: rgba(16, 185, 129, 0.15); padding: 8px 12px; border-radius: 6px; font-size: 0.8rem; color: #a7f3d0;">
+                    💡 <b>Regla de Oro:</b> Si pesas arroz o fideos ya cocidos en tu plato, calcula aproximadamente <b>28g a 30g de carbos por cada 100g de balanza</b>.
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+
+        with col_fam2:
+            st.markdown("""
+            <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.25); border-radius: 10px; padding: 16px;">
+                <h5 style="color: #f87171; margin-top: 0;">2. Los que PIERDEN agua (Carnes, Pollo, Pescados)</h5>
+                <p style="font-size: 0.84rem; color: #cbd5e1; line-height: 1.5;">
+                    Al cocinarse a la plancha, horno o sartén, la carne evapora agua y <b>se encoge entre un 20% y 30%</b>. La proteína no se destruye, se concentra:
+                </p>
+                <ul style="font-size: 0.82rem; color: #cbd5e1; line-height: 1.6;">
+                    <li><b>200g de Pechuga Cruda:</b> Tienen unos <b>44g de Proteína</b> (~220 kcal).</li>
+                    <li>Al cocinarse pierde agua y pesa en balanza solo <b>~150g</b>.</li>
+                    <li>¡Esos 150g cocidos siguen teniendo los mismos 44g de proteína!</li>
+                    <li>Por lo tanto, <b>100g de Pechuga ya Cocida tienen ~30g de Proteína</b> (~150 kcal).</li>
+                </ul>
+                <div style="background: rgba(239, 68, 68, 0.15); padding: 8px 12px; border-radius: 6px; font-size: 0.8rem; color: #fca5a5;">
+                    💡 <b>Regla de Oro:</b> Si pesas carne o pollo cocido, calcula aproximadamente <b>30g de proteína por cada 100g de balanza</b> (frente a 22g en crudo).
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+
+    # --------------------------------------------------------------------------
+    # SUB-PESTAÑA 3: COMER EN PAREJA CON METAS DISTINTAS
+    # --------------------------------------------------------------------------
+    with tab_g3:
+        st.markdown("#### 👫 Comer en Pareja con Metas Distintas")
+        st.markdown(
+            "Cocinar para dos personas con diferentes requerimientos calóricos (~2.150 kcal vs. ~1.300-1.500 kcal) "
+            "no significa cocinar dos menús separados. Aplica estas estrategias de oro para comer lo mismo disfrutando de la mesa:"
+        )
+
+        col_par1, col_par2 = st.columns(2)
+        with col_par1:
+            st.markdown("""
+            <div style="background: rgba(30, 41, 59, 0.65); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 18px; height: 100%;">
+                <h5 style="color: #38bdf8; margin-top: 0;">🥘 La Técnica de la "Base Común + Ajuste en Plato"</h5>
+                <p style="font-size: 0.85rem; color: #cbd5e1; line-height: 1.5;">
+                    La forma más inteligente y cómoda de cocinar juntos:
+                </p>
+                <ol style="font-size: 0.82rem; color: #cbd5e1; line-height: 1.6;">
+                    <li><b>Paso 1 (La Olla Base):</b> Preparen juntos una preparación compartida rica en proteína magra y vegetales (ej: pollo salteado con verduras, salsa boloñesa con carne picada magra, estofado o cazuela).</li>
+                    <li><b>Paso 2 (Servir en Balanza):</b> Usen la Olla Compartida de la app (Pestaña 1) y pesen en balanza para servir la proporción exacta de cada uno (ej. 60% Él / 40% Ella).</li>
+                    <li><b>Paso 3 (El Ajuste Calórico):</b><br>
+                        • 👨 <b>Él (necesita más calorías/carbos):</b> Suma a su plato una porción extra de arroz, fideos o papa hervida.<br>
+                        • 👩 <b>Ella (necesita volumen con pocas calorías):</b> Suma a su plato una ensalada de hojas verdes fresca o vegetales al vapor.
+                    </li>
+                </ol>
+                <div style="background: rgba(56, 189, 248, 0.12); padding: 8px 12px; border-radius: 6px; font-size: 0.78rem; color: #bae6fd;">
+                    ✨ <b>Resultado:</b> Comen el mismo plato caliente, cocinan una sola vez y cada uno cumple al gramo su déficit.
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+
+        with col_par2:
+            st.markdown("""
+            <div style="background: rgba(236, 72, 153, 0.08); border: 1px solid rgba(236, 72, 153, 0.3); border-radius: 12px; padding: 18px; height: 100%;">
+                <h5 style="color: #f472b6; margin-top: 0;">🥗 El Secreto del "Volumen de Saciedad" para Ella (~1.300 kcal)</h5>
+                <p style="font-size: 0.85rem; color: #cbd5e1; line-height: 1.5;">
+                    Comer 1.300 a 1.500 kcal no debe significar pasar hambre. La clave biológica es la <b>baja densidad calórica</b> (mucho volumen en el estómago por pocas calorías):
+                </p>
+                <ul style="font-size: 0.82rem; color: #cbd5e1; line-height: 1.6;">
+                    <li><b>Comparativa de Carbohidratos:</b><br>
+                        • 100g de arroz cocido = 130 kcal (ocupa un puñito pequeño).<br>
+                        • 100g de papa hervida = <b>80 kcal</b> (¡el doble de volumen y triple de saciedad!).<br>
+                        • 250g de zapallitos o calabaza = <b>solo 65 kcal</b> (¡llena un plato hondo entero!).
+                    </li>
+                    <li><b>Trucos de Saciedad Inmediata:</b><br>
+                        • Rallar zucchini, zanahoria o champiñones dentro de la carne molida.<br>
+                        • Acompañar siempre con ensalada de hojas verdes o repollo crocante.<br>
+                        • Tomar 1 vaso de agua fría o con gas antes de cada comida principal.
+                    </li>
+                </ul>
+                <div style="background: rgba(236, 72, 153, 0.15); padding: 8px 12px; border-radius: 6px; font-size: 0.78rem; color: #fbcfe8;">
+                    🍽️ <b>Sensación:</b> Terminas la comida con el estómago lleno y satisfecho, sin ansiedad posterior.
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+
+    # --------------------------------------------------------------------------
+    # SUB-PESTAÑA 4: LA CHULETA & REGLA DE LA MANO
+    # --------------------------------------------------------------------------
+    with tab_g4:
+        st.markdown("#### 📋 La Chuleta Rápida & Estimación con la Mano")
+        st.markdown("Referencia inmediata de alimentos cotidianos y la guía visual de porciones cuando comes afuera o no tienes balanza.")
+
+        # GUÍA VISUAL DE LA MANO
+        with st.expander("🖐️ La Guía Visual de la Mano (Para comer afuera, restaurantes o viajes)", expanded=True):
+            st.markdown("Cuando estés en un restaurante o evento social y no puedas usar balanza, usa tu propia mano como referencia estándar:")
+            
+            c_h1, c_h2, c_h3, c_h4 = st.columns(4)
+            with c_h1:
+                st.markdown("""
+                <div style="background: rgba(59, 130, 246, 0.12); border: 1px solid rgba(59, 130, 246, 0.35); border-radius: 10px; padding: 14px; text-align: center; height: 100%;">
+                    <div style="font-size: 2rem;">✋</div>
+                    <strong style="color: #60a5fa; font-size: 0.95rem;">Palma de la Mano</strong>
+                    <div style="font-size: 0.78rem; color: #94a3b8; margin: 4px 0;">(Grosor y tamaño sin dedos)</div>
+                    <div style="font-size: 1.1rem; font-weight: 700; color: #f8fafc;">~100g - 120g</div>
+                    <div style="font-size: 0.8rem; color: #cbd5e1; margin-top: 4px;">🍗 <b>25g a 30g Proteína</b><br>(Carne, pollo o pescado cocido)</div>
+                </div>
+                """, unsafe_allow_html=True)
+            with c_h2:
+                st.markdown("""
+                <div style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 10px; padding: 14px; text-align: center; height: 100%;">
+                    <div style="font-size: 2rem;">✊</div>
+                    <strong style="color: #34d399; font-size: 0.95rem;">Puño Cerrado</strong>
+                    <div style="font-size: 0.78rem; color: #94a3b8; margin: 4px 0;">(Volumen aproximado 1 taza)</div>
+                    <div style="font-size: 1.1rem; font-weight: 700; color: #f8fafc;">~100g - 120g</div>
+                    <div style="font-size: 0.8rem; color: #cbd5e1; margin-top: 4px;">🍞 <b>25g a 30g Carbos</b><br>(Arroz, fideos cocidos o 1 papa)</div>
+                </div>
+                """, unsafe_allow_html=True)
+            with c_h3:
+                st.markdown("""
+                <div style="background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.35); border-radius: 10px; padding: 14px; text-align: center; height: 100%;">
+                    <div style="font-size: 2rem;">👍</div>
+                    <strong style="color: #fbbf24; font-size: 0.95rem;">Dedo Pulgar Entero</strong>
+                    <div style="font-size: 0.78rem; color: #94a3b8; margin: 4px 0;">(De la base a la punta)</div>
+                    <div style="font-size: 1.1rem; font-weight: 700; color: #f8fafc;">~12g - 15g</div>
+                    <div style="font-size: 0.8rem; color: #cbd5e1; margin-top: 4px;">🥑 <b>12g a 14g Grasa</b><br>(1 cda sopera de aceite o manteca)</div>
+                </div>
+                """, unsafe_allow_html=True)
+            with c_h4:
+                st.markdown("""
+                <div style="background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.35); border-radius: 10px; padding: 14px; text-align: center; height: 100%;">
+                    <div style="font-size: 2rem;">👐</div>
+                    <strong style="color: #38bdf8; font-size: 0.95rem;">Dos Manos en Cuenco</strong>
+                    <div style="font-size: 0.78rem; color: #94a3b8; margin: 4px 0;">(Juntas abiertas)</div>
+                    <div style="font-size: 1.1rem; font-weight: 700; color: #f8fafc;">~150g - 200g</div>
+                    <div style="font-size: 0.8rem; color: #cbd5e1; margin-top: 4px;">🥗 <b>Vegetales Libres</b><br>(Ensalada verde, tomate, espinaca)</div>
+                </div>
+                """, unsafe_allow_html=True)
+
+        st.markdown("---")
+        st.markdown("##### 🥗 Tabla de Consulta Rápida de Alimentos")
+        lista_chuleta = [
+            {"Alimento": "Arroz Blanco (en crudo)", "Tipo": "Carbohidrato", "Porción": "100g", "Carbos (g)": 78.0, "Prot (g)": 7.0, "Grasa (g)": 0.5, "Kcal": 350.0, "Nota Práctica": "Pesar antes de cocinar en agua."},
+            {"Alimento": "Arroz Blanco (ya cocido)", "Tipo": "Carbohidrato", "Porción": "100g", "Carbos (g)": 28.0, "Prot (g)": 2.5, "Grasa (g)": 0.3, "Kcal": 130.0, "Nota Práctica": "Pesar servido en el plato. Rinde x2.6."},
+            {"Alimento": "Fideos / Pasta (en seco)", "Tipo": "Carbohidrato", "Porción": "100g", "Carbos (g)": 72.0, "Prot (g)": 12.0, "Grasa (g)": 1.5, "Kcal": 355.0, "Nota Práctica": "Pesar en seco crudo."},
+            {"Alimento": "Fideos / Pasta (cocida)", "Tipo": "Carbohidrato", "Porción": "100g", "Carbos (g)": 30.0, "Prot (g)": 5.0, "Grasa (g)": 0.8, "Kcal": 150.0, "Nota Práctica": "Pesar escurrido sin salsa."},
+            {"Alimento": "Papa / Patata hervida", "Tipo": "Carbohidrato", "Porción": "100g", "Carbos (g)": 17.0, "Prot (g)": 2.0, "Grasa (g)": 0.1, "Kcal": 80.0, "Nota Práctica": "Altísimo índice de saciedad por pocas kcal."},
+            {"Alimento": "Batata / Boniato al horno", "Tipo": "Carbohidrato", "Porción": "100g", "Carbos (g)": 21.0, "Prot (g)": 1.6, "Grasa (g)": 0.2, "Kcal": 95.0, "Nota Práctica": "Rica en fibra y carbohidrato complejo."},
+            {"Alimento": "Avena en copos (seca)", "Tipo": "Carbohidrato", "Porción": "100g", "Carbos (g)": 60.0, "Prot (g)": 13.5, "Grasa (g)": 7.0, "Kcal": 370.0, "Nota Práctica": "Aporta beta-glucanos y saciedad prolongada."},
+            {"Alimento": "Pan Integral de molde (2 rodajas)", "Tipo": "Carbohidrato", "Porción": "50g", "Carbos (g)": 24.0, "Prot (g)": 4.5, "Grasa (g)": 1.5, "Kcal": 130.0, "Nota Práctica": "2 rebanadas estándar de sandwich."},
+            {"Alimento": "Pechuga de Pollo (cruda)", "Tipo": "Proteína", "Porción": "100g", "Carbos (g)": 0.0, "Prot (g)": 22.5, "Grasa (g)": 2.0, "Kcal": 110.0, "Nota Práctica": "La reina de la proteína magra limpia."},
+            {"Alimento": "Pechuga de Pollo (cocida/grill)", "Tipo": "Proteína", "Porción": "100g", "Carbos (g)": 0.0, "Prot (g)": 31.0, "Grasa (g)": 3.0, "Kcal": 155.0, "Nota Práctica": "Al perder agua la proteína se concentra."},
+            {"Alimento": "Carne Vacuna Magra (Nalga/Lomo)", "Tipo": "Proteína", "Porción": "100g", "Carbos (g)": 0.0, "Prot (g)": 21.5, "Grasa (g)": 4.5, "Kcal": 130.0, "Nota Práctica": "Cortes desgrasados, excelente hierro y zinc."},
+            {"Alimento": "Huevos enteros (2 unidades)", "Tipo": "Proteína + Grasa", "Porción": "100g", "Carbos (g)": 1.0, "Prot (g)": 13.0, "Grasa (g)": 10.0, "Kcal": 150.0, "Nota Práctica": "2 huevos medianos. Excelente colina y vitaminas."},
+            {"Alimento": "Claras de Huevo (3 unidades)", "Tipo": "Proteína", "Porción": "100g", "Carbos (g)": 0.7, "Prot (g)": 11.0, "Grasa (g)": 0.2, "Kcal": 50.0, "Nota Práctica": "Proteína pura sin grasa ni colesterol."},
+            {"Alimento": "Atún al natural en lata (escurrido)", "Tipo": "Proteína", "Porción": "120g", "Carbos (g)": 0.0, "Prot (g)": 28.0, "Grasa (g)": 1.0, "Kcal": 125.0, "Nota Práctica": "1 lata estándar escurrida al natural."},
+            {"Alimento": "Queso Port Salut / Magro", "Tipo": "Proteína + Grasa", "Porción": "50g", "Carbos (g)": 1.0, "Prot (g)": 11.0, "Grasa (g)": 7.0, "Kcal": 115.0, "Nota Práctica": "Aporta calcio y caseína de digestión lenta."},
+            {"Alimento": "Aceite de Oliva (1 cucharada sopera)", "Tipo": "Grasa", "Porción": "14g", "Carbos (g)": 0.0, "Prot (g)": 0.0, "Grasa (g)": 14.0, "Kcal": 126.0, "Nota Práctica": "100% grasa pura monoinsaturada cardiosaludable."},
+            {"Alimento": "Palta / Aguacate", "Tipo": "Grasa", "Porción": "100g", "Carbos (g)": 2.0, "Prot (g)": 2.0, "Grasa (g)": 15.0, "Kcal": 160.0, "Nota Práctica": "Grasas buenas con 7g de fibra saciante."},
+            {"Alimento": "Frutos Secos (Nueces / Almendras)", "Tipo": "Grasa + Prot", "Porción": "30g", "Carbos (g)": 4.0, "Prot (g)": 6.0, "Grasa (g)": 16.0, "Kcal": 185.0, "Nota Práctica": "1 puñado cerrado (fácil de sobrepasar)."},
+            {"Alimento": "Pasta / Manteca de Maní pura", "Tipo": "Grasa + Prot", "Porción": "20g", "Carbos (g)": 3.0, "Prot (g)": 5.5, "Grasa (g)": 10.0, "Kcal": 125.0, "Nota Práctica": "1 cucharada colmada. Sin azúcar agregada."}
+        ]
+
+        df_ch = pd.DataFrame(lista_chuleta)
+        filtro_tipo = st.selectbox("Filtrar por grupo de macronutriente:", ["Todos los alimentos", "Carbohidrato", "Proteína", "Grasa"], key="filtro_chuleta_v2")
+        if filtro_tipo != "Todos los alimentos":
+            df_mostrar_ch = df_ch[df_ch["Tipo"].str.contains(filtro_tipo)]
+        else:
+            df_mostrar_ch = df_ch
+
+        st.dataframe(df_mostrar_ch, use_container_width=True, height=400)
+
+    # --------------------------------------------------------------------------
+    # SUB-PESTAÑA 5: TRAMPAS OCULTAS, AGUA & SAL EN CAMINANTES
+    # --------------------------------------------------------------------------
+    with tab_g5:
+        st.markdown("#### 🚨 Las Trampas Ocultas de la Cocina & Manejo de Agua y Sal")
+        
+        st.markdown("##### ⚠️ Las 4 Trampas que Arruinan un Déficit sin Darse Cuenta")
+        col_t1, col_t2 = st.columns(2)
+        with col_t1:
+            st.markdown("""
+            <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 10px; padding: 14px; margin-bottom: 12px;">
+                <strong style="color: #f87171; font-size: 0.95rem;">1. 🫒 El chorrito de aceite de oliva "a ojo"</strong>
+                <p style="font-size: 0.82rem; color: #cbd5e1; margin-top: 4px;">
+                    Un "chorrito generoso" en la sartén o ensaladera suele pesar <b>20g a 25g de aceite</b> (¡más de 200 kcal!). Dos veces al día son <b>400 kcal invisibles</b> que borran por completo el esfuerzo de una caminata de 1 hora.
+                    <br>👉 <i>Solución:</i> Usar un pulverizador en spray o verter sobre la cuchara pesando en balanza.
+                </p>
+            </div>
+            <div style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 10px; padding: 14px;">
+                <strong style="color: #fbbf24; font-size: 0.95rem;">2. 🧀 Picar mientras se cocina</strong>
+                <p style="font-size: 0.82rem; color: #cbd5e1; margin-top: 4px;">
+                    Probar un cubo de queso, 4 aceitunas, mojar dos pedazos de pan en la salsa y comer 5 nueces mientras preparas la cena suma <b>250 a 350 kcal</b> que el cerebro no registra como comida.
+                    <br>👉 <i>Solución:</i> Tener a mano tomates cherry o agua con gas mientras cocinas.
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
+
+        with col_t2:
+            st.markdown("""
+            <div style="background: rgba(168, 85, 247, 0.08); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 10px; padding: 14px; margin-bottom: 12px;">
+                <strong style="color: #c084fc; font-size: 0.95rem;">3. 🥫 Salsas y aderezos ultraprocesados</strong>
+                <p style="font-size: 0.82rem; color: #cbd5e1; margin-top: 4px;">
+                    Mayonesas comunes (70% aceite vegetal refinado), salsas césar, barbacoa con jarabe de maíz o kétchup azucarado añaden 150 kcal por porción.
+                    <br>👉 <i>Solución:</i> Mostaza dijon, vinagre de manzana, jugo de limón, aceto balsámico, especias y queso untable descremado.
+                </p>
+            </div>
+            <div style="background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 10px; padding: 14px;">
+                <strong style="color: #60a5fa; font-size: 0.95rem;">4. 🥤 Calorías líquidas</strong>
+                <p style="font-size: 0.82rem; color: #cbd5e1; margin-top: 4px;">
+                    Un vaso de jugo de naranja exprimido requiere 3 naranjas (35g de azúcar rápida sin la fibra de la fruta) que no produce saciedad. Los cafés con leche entera y azúcar aportan 150 kcal cada taza.
+                    <br>👉 <i>Solución:</i> Comer la fruta entera mordida, agua, infusiones, té, mate o café solo.
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
+
+        st.markdown("---")
+        st.markdown("##### 💧 Hidratación, Sal y Electrolitos en Quienes Caminan Regularmente")
+        
+        c_h_a1, c_h_a2 = st.columns(2)
+        with c_h_a1:
+            agua_base_el = peso_el * 0.035
+            agua_cam_el = agua_base_el + 0.50
+            vasos_el = int(round(agua_base_el / 0.25))
+
+            agua_base_ella = peso_ella * 0.035
+            agua_cam_ella = agua_base_ella + 0.50
+            vasos_ella = int(round(agua_base_ella / 0.25))
+
+            st.markdown(f"""
+            <div style="background: rgba(30, 41, 59, 0.65); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 16px;">
+                <h5 style="color: #38bdf8; margin-top: 0;">💧 Requerimiento de Agua Personalizado en Vivo</h5>
+                <p style="font-size: 0.84rem; color: #cbd5e1; line-height: 1.5;">
+                    La regla médica para personas activas: <b>35 ml por cada kilo de peso corporal</b> (+ 500 ml por hora de caminata).
+                </p>
+                <div style="background: rgba(15, 23, 42, 0.85); border-left: 3px solid #38bdf8; padding: 8px 12px; font-family: monospace; font-size: 0.88rem; color: #f8fafc; margin: 8px 0;">
+                    Agua Diaria (L) = (Peso Actual en kg × 0.035 L) + (Horas Caminata × 0.5 L)
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+
+            col_w_el, col_w_ella = st.columns(2)
+            with col_w_el:
+                st.markdown(f"""
+                <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 8px; padding: 12px; margin-top: 8px;">
+                    <strong style="color: #60a5fa; font-size: 0.9rem;">👨 Para Él ({peso_el:.1f} kg actual):</strong>
+                    <div style="font-size: 1.3rem; font-weight: 700; color: #f8fafc; margin: 4px 0;">{agua_base_el:.2f} Litros / día</div>
+                    <div style="font-size: 0.78rem; color: #cbd5e1;">• 🛋️ Día descanso: <b>~{vasos_el} vasos</b> (de 250ml)<br>• 🚶 Con 1h caminata: <b>{agua_cam_el:.2f} L</b></div>
+                </div>
+                """, unsafe_allow_html=True)
+
+            with col_w_ella:
+                st.markdown(f"""
+                <div style="background: rgba(236, 72, 153, 0.1); border: 1px solid rgba(236, 72, 153, 0.3); border-radius: 8px; padding: 12px; margin-top: 8px;">
+                    <strong style="color: #f472b6; font-size: 0.9rem;">👩 Para Ella ({peso_ella:.1f} kg actual):</strong>
+                    <div style="font-size: 1.3rem; font-weight: 700; color: #f8fafc; margin: 4px 0;">{agua_base_ella:.2f} Litros / día</div>
+                    <div style="font-size: 0.78rem; color: #cbd5e1;">• 🛋️ Día descanso: <b>~{vasos_ella} vasos</b> (de 250ml)<br>• 🚶 Con 1h caminata: <b>{agua_cam_ella:.2f} L</b></div>
+                </div>
+                """, unsafe_allow_html=True)
+
+            st.markdown(f"""
+            <div style="background: rgba(56, 189, 248, 0.08); border: 1px dashed rgba(56, 189, 248, 0.3); border-radius: 8px; padding: 10px; margin-top: 10px; font-size: 0.8rem; color: #cbd5e1;">
+                💡 <b>¿Por qué cambia tu necesidad al bajar de peso?</b><br>
+                Con tu peso actual de <b>{peso_el:.1f} kg</b>, tienes más masa celular y volumen sanguíneo que hidratar (~<b>{agua_base_el:.2f} L</b>).<br>
+                Cuando alcances los <b>90 kg</b>, tu necesidad biológica bajará naturalmente a ~<b>{(90.0 * 0.035):.2f} L</b> (¡más de 1 litro menos al día!).
+            </div>
+            """, unsafe_allow_html=True)
+
+        with c_h_a2:
+            st.markdown("""
+            <div style="background: rgba(30, 41, 59, 0.65); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 16px;">
+                <h5 style="color: #f59e0b; margin-top: 0;">🧂 El Gran Mito de la Sal (Sodio)</h5>
+                <p style="font-size: 0.84rem; color: #cbd5e1; line-height: 1.5;">
+                    <b>La sal tiene 0 calorías. No engorda ni crea grasa corporal.</b>
+                </p>
+                <p style="font-size: 0.82rem; color: #cbd5e1; line-height: 1.5;">
+                    Cuando dejas los alimentos ultraprocesados y cocinas comida real en casa, la ingesta de sodio baja bruscamente.
+                    Si sales a caminar 1 hora y sudas, <b>tu cuerpo pierde agua y sodio</b>.
+                </p>
+                <ul style="font-size: 0.8rem; color: #cbd5e1; line-height: 1.5;">
+                    <li><b>Si te falta sal:</b> Sentirás pesadez en las piernas, calambres nocturnos, presión baja y dolor de cabeza.</li>
+                    <li><b>Si un día comes con más sal:</b> La balanza subirá 500g de agua durante 24h a 48h, pero esa agua se orina sola al regularse los electrolitos.</li>
+                </ul>
+                <div style="background: rgba(245, 158, 11, 0.15); padding: 6px 10px; border-radius: 4px; font-size: 0.78rem; color: #fde68a;">
+                    💡 Sala tu comida al gusto razonable sin miedo; es un electrolito vital para el rendimiento físico.
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+
+    # --------------------------------------------------------------------------
+    # SUB-PESTAÑA 6: FÓRMULAS METABÓLICAS & DUDAS FRECUENTES
+    # --------------------------------------------------------------------------
+    with tab_g6:
+        st.markdown("#### 🔬 Explicación de las Fórmulas Científicas de la App")
+        
+        with st.expander("1. ¿Qué es la Tasa Metabólica Basal (TMB - Mifflin-St Jeor)?", expanded=True):
+            st.markdown("""
+            La **TMB** son las calorías mínimas que tu organismo quema en 24 horas simplemente para mantenerte con vida (latidos del corazón, respiración, función hepática, temperatura corporal) en reposo total acostado en cama.
+            
+            **Fórmula de Mifflin-St Jeor:**
+            * 👨 **Hombres:** `(10 × Peso en kg) + (6.25 × Altura en cm) - (5 × Edad) + 5`
+            * 👩 **Mujeres:** `(10 × Peso en kg) + (6.25 × Altura en cm) - (5 × Edad) - 161`
+            
+            *Por qué es vital:* **Nunca debes comer por debajo de tu TMB de forma crónica**, ya que tu cuerpo lo interpreta como inanición, bajando la tiroides y quemando músculo en lugar de grasa.
+            """)
+
+        with st.expander("2. ¿Qué es el Techo Sedentario / Gasto Base (TMB × 1.2)?"):
+            st.markdown("""
+            Es el gasto de un día en el que **no sales a hacer caminata ni ejercicio programado**, pero te levantas de la cama, te bañas, cocinas, trabajas sentado o te mueves por la casa.
+            
+            Ese movimiento diario espontáneo se llama **NEAT** (*Non-Exercise Activity Thermogenesis*) y en personas sedentarias representa aproximadamente un **20% extra sobre el piso vital** (`TMB × 1.2`).
+            """)
+
+        with st.expander("3. ¿Cómo se calcula la Quema de las Caminatas y Ejercicios (METs)?"):
+            st.markdown("""
+            El **MET** (*Metabolic Equivalent of Task*) es la unidad científica estándar de intensidad de ejercicio (1 MET = reposo sentado).
+            
+            **Fórmula exacta aplicada en la app:**
+            $$\\text{Kcal Quemadas} = \\text{METs} \\times \\text{Peso Corporal (kg)} \\times \\text{Horas}$$
+            
+            * **Caminata suave (4.0 km/h):** 3.0 METs
+            * **Caminata constante/ligera (5.0 km/h):** 4.0 METs
+            * **Caminata rápida (5.8 km/h):** 4.8 METs
+            * **Musculación / Gimnasio:** 4.5 METs
+            
+            *Por qué el peso importa tanto:* Una persona de 119 kg quema **476 kcal** en 1 hora de caminata a 4.0 METs ($4.0 \\times 119$), mientras que una de 69 kg quema **276 kcal** ($4.0 \\times 69$) al mismo ritmo exacto. Mover más masa requiere más energía mecánica.
+            """)
+
+        with st.expander("4. La Regla de Oro de las 7.700 kcal (¿Cómo se pierde 1 kg de grasa?)"):
+            st.markdown("""
+            1 kilogramo de tejido adiposo humano almacena aproximadamente **7.700 kilocalorías de energía química**.
+            
+            * Para perder **1 kg de grasa pura**, necesitas acumular un **déficit calórico neto de 7.700 kcal**.
+            * Si mantienes un déficit diario de **500 kcal**:
+              * En 7 días habrás acumulado un déficit de **3.500 kcal** $\\rightarrow$ **~0.45 kg de grasa perdida por semana**.
+              * En 1 mes habrás acumulado un déficit de **15.000 kcal** $\\rightarrow$ **~2.0 kg de grasa pura perdida al mes**.
+            """)
+
+        with st.expander("5. ¿Por qué la balanza sube 1 kg de un día para otro si no rompí la dieta?"):
+            st.markdown("""
+            **Es fisiológicamente imposible ganar 1 kg de grasa en 24 horas** (requeriría comer 7.700 kcal de golpe *por encima* de tu gasto, es decir, ¡más de 10.000 kcal en un solo día!).
+            
+            Las fluctuaciones diarias de 0.5 kg a 1.5 kg en la balanza se deben a:
+            1. **Agua de Carbohidratos (Glucógeno):** Cada gramo de carbohidrato que entra a los músculos retiene de 3 a 4 gramos de agua. Si cenaste más arroz o pasta, te pesas más pesado porque tus músculos están hidratados, no con grasa.
+            2. **Sodio y Sal:** Una comida con más sal retiene agua extracelular durante 24-48 horas.
+            3. **Tránsito Intestinal:** El volumen y peso de la comida aún en digestión antes de evacuar.
+            4. **Cortisol (Estrés o poco sueño):** El estrés eleva el cortisol, que actúa sobre los receptores de aldosterona provocando retención hídrica temporal.
+            
+            *Consejo:* Mira siempre el promedio semanal o la curva a 24 semanas de la app, nunca el número aislado de un solo día.
+            """)
+

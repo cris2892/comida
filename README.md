@@ -58,6 +58,14 @@ Plataforma analítica e interactiva desarrollada con **Streamlit** y **Plotly**,
 * Gráfica comparativa superponiendo la **curva teórica proyectada** contra los **pesos reales registrados**.
 * Métricas de avance acumulado desde el inicio del programa.
 
+### 5. 📚 Guía Metabólica & Glosario Nutricional
+* **🧬 Rol de Cada Macronutriente:** Explicación biológica profunda de Proteínas (TEF, preservación muscular), Carbohidratos (combustible, tiroides/leptina) y Grasas (piso hormonal de seguridad).
+* **🧮 Calculadora Interactiva de Gramos por Kilo (g/kg):** Simulador interactivo en vivo con presets para Él y Ella para calcular requerimientos exactos según peso magro y objetivo.
+* **👫 Estrategias de Alimentación en Pareja:** Técnica de "Olla Base Común + Ajuste en Plato" y el secreto del volumen de saciedad para dietas de 1.300-1.500 kcal sin pasar hambre.
+* **📋 Chuleta de Alimentos & Regla de la Mano:** Tabla de macronutrientes de alimentos cotidianos y guía visual de porciones (palma, puño, pulgar, cuenco) para comer afuera o en restaurantes sin balanza.
+* **🚨 Trampas Ocultas, Agua & Sal:** Desglose del aceite "a ojo", picar al cocinar, aderezos y bebidas calóricas, junto con el cálculo dinámico de agua personalizado según el peso actual y desmitificación de la sal.
+* **🔬 Fórmulas Científicas & Dudas Frecuentes:** Mifflin-St Jeor, Factor 1.2 (NEAT), METs, regla de las 7.700 kcal y explicación de las fluctuaciones de peso por glucógeno y cortisol.
+
 ---
 
 ## 💾 Persistencia de Datos 100% Local y Offline
