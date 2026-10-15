@@ -20,9 +20,10 @@ Plataforma analítica e interactiva desarrollada con **Streamlit** y **Plotly**,
 * **Exportación para WhatsApp:** Genera un resumen con formato y emojis listo para copiar y pegar por mensajería.
 
 ### 2. 📅 Registro & Balance Semanal (Lunes a Domingo)
-* **Planificación Día a Día:** Pestañas dedicadas para cada día de la semana (Lunes a Domingo).
-* **Carga Rápida:** Asigna comidas completas desde la Olla Compartida o agrega snacks/alimentos individuales para *Solo Él*, *Solo Ella* o *Ambos*.
-* **Control Detallado:** Lista por día con calorías, proteínas, carbohidratos, grasas y botón `❌` para eliminar ítems específicos.
+* **🧭 Mini-Dashboard de Ritmo Semanal (7 Días):** Tira superior compacta que resume de un solo vistazo el estado de cada día (Lunes a Domingo) con chips de balance calórico neto (`🟢 Déficit` / `🔵 Superávit` / `⚪ Sin registro`).
+* **📐 Layout Diario en Doble Columna Maestra:**
+  * **Columna Izquierda (🍽️ Nutrición & Comidas):** Lista limpia de alimentos cargados con macros, desglose calórico y formulario rápido de carga.
+  * **Columna Derecha (🏃 Actividades & Smartwatch):** Acceso rápido con **chips de 1 clic** (`[🚶 30m Paseo]`, `[🚶‍♂️ 1h Caminata]`, `[🏋️ 1h Gimnasio]`), panel para calorías de reloj inteligente y detalle de actividades.
 * **🏃/⌚ Gestor de Múltiples Actividades Físicas por Día:**
   * **Múltiples sesiones diarias:** Permite registrar todas las actividades que realices en el día (ej: Caminata matutina + Sesión de Gimnasio/Pesas + Partido de Pádel o Bici).
   * **Catálogo de Ejercicios Integrado:** Incluye caminata paso constante/ligero/rápido, musculación/gimnasio, ciclismo, running, pádel/tenis, natación, yoga/pilates, funcional/HIIT y actividades personalizadas.

@@ -1,0 +1,46 @@
+{
+  "Lunes": [
+    {
+      "id": 1,
+      "descripcion": "400g Empanada Pabellon (1 u = 120g)",
+      "el_kcal": 1333.2,
+      "el_p": 33.2,
+      "el_c": 120.0,
+      "el_g": 60.0,
+      "ella_kcal": 0.0,
+      "ella_p": 0.0,
+      "ella_c": 0.0,
+      "ella_g": 0.0
+    },
+    {
+      "id": 2,
+      "descripcion": "300g Empanada Pabellon (1 u = 120g)",
+      "el_kcal": 0.0,
+      "el_p": 0.0,
+      "el_c": 0.0,
+      "el_g": 0.0,
+      "ella_kcal": 999.9,
+      "ella_p": 24.9,
+      "ella_c": 90.0,
+      "ella_g": 45.0
+    },
+    {
+      "id": 3,
+      "descripcion": "300g Arepa Atun (1 u = 100g)",
+      "el_kcal": 702.0,
+      "el_p": 37.8,
+      "el_c": 68.4,
+      "el_g": 34.2,
+      "ella_kcal": 468.0,
+      "ella_p": 25.2,
+      "ella_c": 45.6,
+      "ella_g": 22.8
+    }
+  ],
+  "Martes": [],
+  "Miércoles": [],
+  "Jueves": [],
+  "Viernes": [],
+  "Sábado": [],
+  "Domingo": []
+}

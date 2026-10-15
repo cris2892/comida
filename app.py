@@ -445,274 +445,258 @@ df_alimentos = get_catalogo_alimentos()
 # ==============================================================================
 # SIDEBAR: PARÁMETROS BIOMÉTRICOS & ACTIVIDAD FÍSICA
 # ==============================================================================
-st.sidebar.markdown("## ⚙️ Parámetros Biométricos")
+st.sidebar.markdown("## ⚙️ Configuración Personal")
 
 cfg_usuario = cargar_config_usuario()
 
-# --- PERFIL BIOMÉTRICO: ÉL ---
-st.sidebar.markdown("### 👨 Perfil: Él")
-col_el1, col_el2 = st.sidebar.columns(2)
-with col_el1:
-    peso_el = st.number_input("Peso (kg)", min_value=50.0, max_value=170.0, value=float(cfg_usuario.get("peso_el", 119.0)), step=0.5, key="peso_el")
-with col_el2:
-    altura_el = st.number_input("Altura (cm)", min_value=130, max_value=220, value=int(cfg_usuario.get("altura_el", 180)), step=1, key="altura_el")
+tab_sb_el, tab_sb_ella, tab_sb_act = st.sidebar.tabs(["👨 Perfil Él", "👩 Perfil Ella", "⚙️ Cardio & Olla"])
 
-edad_el = st.sidebar.number_input("Edad (años)", min_value=18, max_value=99, value=int(cfg_usuario.get("edad_el", 34)), step=1, key="edad_el")
+with tab_sb_el:
+    col_el1, col_el2 = st.columns(2)
+    with col_el1:
+        peso_el = st.number_input("Peso (kg)", min_value=50.0, max_value=170.0, value=float(cfg_usuario.get("peso_el", 119.0)), step=0.5, key="peso_el")
+    with col_el2:
+        altura_el = st.number_input("Altura (cm)", min_value=130, max_value=220, value=int(cfg_usuario.get("altura_el", 180)), step=1, key="altura_el")
+    edad_el = st.number_input("Edad (años)", min_value=18, max_value=99, value=int(cfg_usuario.get("edad_el", 34)), step=1, key="edad_el")
 
-st.sidebar.markdown("---")
+with tab_sb_ella:
+    col_ella1, col_ella2 = st.columns(2)
+    with col_ella1:
+        peso_ella = st.number_input("Peso (kg)", min_value=35.0, max_value=140.0, value=float(cfg_usuario.get("peso_ella", 69.0)), step=0.5, key="peso_ella")
+    with col_ella2:
+        altura_ella = st.number_input("Altura (cm)", min_value=120, max_value=200, value=int(cfg_usuario.get("altura_ella", 150)), step=1, key="altura_ella")
+    edad_ella = st.number_input("Edad (años)", min_value=18, max_value=99, value=int(cfg_usuario.get("edad_ella", 33)), step=1, key="edad_ella")
 
-# --- PERFIL BIOMÉTRICO: ELLA ---
-st.sidebar.markdown("### 👩 Perfil: Ella")
-col_ella1, col_ella2 = st.sidebar.columns(2)
-with col_ella1:
-    peso_ella = st.number_input("Peso (kg)", min_value=35.0, max_value=140.0, value=float(cfg_usuario.get("peso_ella", 69.0)), step=0.5, key="peso_ella")
-with col_ella2:
-    altura_ella = st.number_input("Altura (cm)", min_value=120, max_value=200, value=int(cfg_usuario.get("altura_ella", 150)), step=1, key="altura_ella")
+with tab_sb_act:
+    st.markdown("### 🚶 Actividad Semanal (Caminatas)")
+    horas_sem = st.slider("Horas de caminata por semana", min_value=0.0, max_value=14.0, value=float(cfg_usuario.get("horas_sem", 3.0)), step=0.5,
+                          help="Ejemplo: 3 horas semanales = Lunes, Jueves y Viernes 1h c/u.")
+    intensidad_mets_dict = {
+        "4.0 METs - Caminata paso constante/ligero (4.8 - 5.0 km/h)": 4.0,
+        "3.0 METs - Caminata suave (4.0 km/h)": 3.0,
+        "4.8 METs - Caminata rápida (5.5 - 6.0 km/h)": 4.8
+    }
+    idx_mets = list(intensidad_mets_dict.keys()).index(cfg_usuario.get("opcion_mets")) if cfg_usuario.get("opcion_mets") in intensidad_mets_dict else 0
+    opcion_mets = st.selectbox("Intensidad (METs)", list(intensidad_mets_dict.keys()), index=idx_mets)
+    mets_val = intensidad_mets_dict[opcion_mets]
 
-edad_ella = st.sidebar.number_input("Edad (años)", min_value=18, max_value=99, value=int(cfg_usuario.get("edad_ella", 33)), step=1, key="edad_ella")
+    st.markdown("---")
+    st.markdown("### 🍲 Reparto de la Olla Compartida")
+    lista_reparto = ["Dinámica según Metas Calóricas", "Fija Estándar (60% Él / 40% Ella)"]
+    idx_reparto = lista_reparto.index(cfg_usuario.get("tipo_reparto")) if cfg_usuario.get("tipo_reparto") in lista_reparto else 0
+    tipo_reparto = st.radio("Proporción de Olla Compartida", lista_reparto, index=idx_reparto)
 
-st.sidebar.markdown("---")
-
-# --- ACTIVIDAD SEMANAL (CAMINATAS & METs) ---
-st.sidebar.markdown("### 🚶 Actividad Semanal (Caminatas)")
-horas_sem = st.sidebar.slider("Horas de caminata por semana", min_value=0.0, max_value=14.0, value=float(cfg_usuario.get("horas_sem", 3.0)), step=0.5,
-                              help="Ejemplo: 3 horas semanales = Lunes, Jueves y Viernes 1h c/u.")
-
-intensidad_mets_dict = {
-    "4.0 METs - Caminata paso constante/ligero (4.8 - 5.0 km/h)": 4.0,
-    "3.0 METs - Caminata suave (4.0 km/h)": 3.0,
-    "4.8 METs - Caminata rápida (5.5 - 6.0 km/h)": 4.8
-}
-idx_mets = list(intensidad_mets_dict.keys()).index(cfg_usuario.get("opcion_mets")) if cfg_usuario.get("opcion_mets") in intensidad_mets_dict else 0
-opcion_mets = st.sidebar.selectbox("Intensidad (METs)", list(intensidad_mets_dict.keys()), index=idx_mets)
-mets_val = intensidad_mets_dict[opcion_mets]
-
-# ==============================================================================
 # CÁLCULOS METABÓLICOS BASE (MIFFLIN-ST JEOR & TDEE)
-# ==============================================================================
-# Él
 tmb_el = (10.0 * peso_el) + (6.25 * altura_el) - (5.0 * edad_el) + 5.0
 sed_el = tmb_el * 1.2
 quema_1h_el = mets_val * peso_el * 1.0
 techo_cam_el = sed_el + quema_1h_el
 tdee_prom_el = sed_el + ((quema_1h_el * horas_sem) / 7.0)
 
-# Ella
 tmb_ella = (10.0 * peso_ella) + (6.25 * altura_ella) - (5.0 * edad_ella) - 161.0
 sed_ella = tmb_ella * 1.2
 quema_1h_ella = mets_val * peso_ella * 1.0
 techo_cam_ella = sed_ella + quema_1h_ella
 tdee_prom_ella = sed_ella + ((quema_1h_ella * horas_sem) / 7.0)
 
-st.sidebar.markdown("---")
+with tab_sb_el:
+    st.markdown("---")
+    st.markdown("### 🎯 Objetivo & Meta Calórica (Él)")
+    lista_act_el = [
+        "📉 Déficit Moderado (Base 2150 kcal)",
+        "📉 Déficit Ligero (Base 2400 kcal)",
+        "⚖️ Mantenimiento Metabólico (TDEE)",
+        "📈 Superávit (+300 kcal Ganancia / Volumen)",
+        "🛠️ Personalizado (Ajustar a mano kcal o macros)"
+    ]
+    idx_act_el = lista_act_el.index(cfg_usuario.get("opcion_act_el")) if cfg_usuario.get("opcion_act_el") in lista_act_el else 0
+    opcion_act_el = st.selectbox("Meta Nutricional (Él)", lista_act_el, index=idx_act_el, key="sel_act_el")
 
-# --- OBJETIVO & META CALÓRICA: ÉL ---
-st.sidebar.markdown("### 🎯 Objetivo & Meta Calórica (Él)")
-lista_act_el = [
-    "📉 Déficit Moderado (Base 2150 kcal)",
-    "📉 Déficit Ligero (Base 2400 kcal)",
-    "⚖️ Mantenimiento Metabólico (TDEE)",
-    "📈 Superávit (+300 kcal Ganancia / Volumen)",
-    "🛠️ Personalizado (Ajustar a mano kcal o macros)"
-]
-idx_act_el = lista_act_el.index(cfg_usuario.get("opcion_act_el")) if cfg_usuario.get("opcion_act_el") in lista_act_el else 0
-opcion_act_el = st.sidebar.selectbox("Meta Nutricional (Él)", lista_act_el, index=idx_act_el, key="sel_act_el")
+    custom_kcal_el_val = float(cfg_usuario.get("custom_kcal_el", 2150.0))
+    custom_p_el_val = float(cfg_usuario.get("custom_p_el", 188.0))
+    custom_c_el_val = float(cfg_usuario.get("custom_c_el", 210.0))
+    custom_g_el_val = float(cfg_usuario.get("custom_g_el", 60.0))
+    modo_pers_el_val = str(cfg_usuario.get("modo_pers_el", "Calorías Totales Directas (kcal)"))
 
-# Variables personalizadas Él para persistencia
-custom_kcal_el_val = float(cfg_usuario.get("custom_kcal_el", 2150.0))
-custom_p_el_val = float(cfg_usuario.get("custom_p_el", 188.0))
-custom_c_el_val = float(cfg_usuario.get("custom_c_el", 210.0))
-custom_g_el_val = float(cfg_usuario.get("custom_g_el", 60.0))
-modo_pers_el_val = str(cfg_usuario.get("modo_pers_el", "Calorías Totales Directas (kcal)"))
-
-if "Personalizado" in opcion_act_el:
-    st.sidebar.markdown("""
-    <div style="background: rgba(59, 130, 246, 0.12); border: 1px solid rgba(59, 130, 246, 0.35); border-radius: 8px; padding: 10px; margin-top: 6px; margin-bottom: 10px;">
-        <strong style="color: #60a5fa; font-size: 0.9rem;">🛠️ Panel Personalizado (Él)</strong><br>
-        <span style="font-size: 0.78rem; color: #cbd5e1;">Ajusta tus calorías o tus gramos de macros libremente:</span>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    modo_pers_el_val = st.sidebar.radio(
-        "Ajustar por (Él):",
-        ["Gramos de Macronutrientes (P, C, G)", "Calorías Totales Directas (kcal)"],
-        index=0 if modo_pers_el_val == "Gramos de Macronutrientes (P, C, G)" else 1,
-        key="modo_pers_el"
-    )
-    
-    if modo_pers_el_val == "Calorías Totales Directas (kcal)":
-        custom_kcal_el_val = st.sidebar.number_input(
-            "Calorías Diarias Asignadas (kcal)",
-            min_value=1000.0, max_value=5000.0, value=custom_kcal_el_val, step=50.0,
-            key="custom_kcal_el",
-            help="Presupuesto calórico diario que te asignó tu plan o nutricionista."
+    if "Personalizado" in opcion_act_el:
+        st.markdown("""
+        <div style="background: rgba(59, 130, 246, 0.12); border: 1px solid rgba(59, 130, 246, 0.35); border-radius: 8px; padding: 10px; margin-top: 6px; margin-bottom: 10px;">
+            <strong style="color: #60a5fa; font-size: 0.9rem;">🛠️ Panel Personalizado (Él)</strong><br>
+            <span style="font-size: 0.78rem; color: #cbd5e1;">Ajusta tus calorías o tus gramos de macros libremente:</span>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        modo_pers_el_val = st.radio(
+            "Ajustar por (Él):",
+            ["Gramos de Macronutrientes (P, C, G)", "Calorías Totales Directas (kcal)"],
+            index=0 if modo_pers_el_val == "Gramos de Macronutrientes (P, C, G)" else 1,
+            key="modo_pers_el"
         )
-        meta_kcal_el = custom_kcal_el_val
-        req_p_el = round((meta_kcal_el * 0.35) / 4.0)
-        req_c_el = round((meta_kcal_el * 0.40) / 4.0)
+        
+        if modo_pers_el_val == "Calorías Totales Directas (kcal)":
+            custom_kcal_el_val = st.number_input(
+                "Calorías Diarias Asignadas (kcal)",
+                min_value=1000.0, max_value=5000.0, value=custom_kcal_el_val, step=50.0,
+                key="custom_kcal_el",
+                help="Presupuesto calórico diario que te asignó tu plan o nutricionista."
+            )
+            meta_kcal_el = custom_kcal_el_val
+            req_p_el = round((meta_kcal_el * 0.35) / 4.0)
+            req_c_el = round((meta_kcal_el * 0.40) / 4.0)
+            req_g_el = round((meta_kcal_el * 0.25) / 9.0)
+            st.caption(f"Distribución sugerida (35% P, 40% C, 25% G): **{req_p_el:.0f}g P | {req_c_el:.0f}g C | {req_g_el:.0f}g G**")
+        else:
+            st.markdown("**Gramos Diarios (Él):**")
+            c_p_el, c_c_el, c_g_el = st.columns(3)
+            with c_p_el:
+                custom_p_el_val = st.number_input("Prot (g)", min_value=10.0, max_value=400.0, value=custom_p_el_val, step=1.0, key="custom_p_el")
+            with c_c_el:
+                custom_c_el_val = st.number_input("Carb (g)", min_value=10.0, max_value=600.0, value=custom_c_el_val, step=1.0, key="custom_c_el")
+            with c_g_el:
+                custom_g_el_val = st.number_input("Grasa (g)", min_value=10.0, max_value=250.0, value=custom_g_el_val, step=1.0, key="custom_g_el")
+            req_p_el = custom_p_el_val
+            req_c_el = custom_c_el_val
+            req_g_el = custom_g_el_val
+            meta_kcal_el = (req_p_el * 4.0) + (req_c_el * 4.0) + (req_g_el * 9.0)
+            custom_kcal_el_val = meta_kcal_el
+
+    elif "2150" in opcion_act_el:
+        meta_kcal_el = 2150.0
+        req_p_el = 188.0
+        req_c_el = 210.0
+        req_g_el = 60.0
+    elif "2400" in opcion_act_el:
+        meta_kcal_el = 2400.0
+        req_p_el = 200.0
+        req_c_el = 240.0
+        req_g_el = 70.0
+    elif "Mantenimiento" in opcion_act_el:
+        meta_kcal_el = float(round(tdee_prom_el))
+        req_p_el = round((meta_kcal_el * 0.30) / 4.0)
+        req_c_el = round((meta_kcal_el * 0.45) / 4.0)
         req_g_el = round((meta_kcal_el * 0.25) / 9.0)
-        st.sidebar.caption(f"Distribución sugerida (35% P, 40% C, 25% G): **{req_p_el:.0f}g P | {req_c_el:.0f}g C | {req_g_el:.0f}g G**")
+    else: # Superávit
+        meta_kcal_el = float(round(tdee_prom_el + 300.0))
+        req_p_el = round((meta_kcal_el * 0.30) / 4.0)
+        req_c_el = round((meta_kcal_el * 0.45) / 4.0)
+        req_g_el = round((meta_kcal_el * 0.25) / 9.0)
+
+    # Indicador de estado calórico (Él)
+    delta_el = meta_kcal_el - tdee_prom_el
+    if delta_el <= -15:
+        badge_estado_el = f"<span style='color:#10b981; font-weight:700;'>📉 Déficit: {delta_el:.0f} kcal</span>"
+    elif delta_el >= 15:
+        badge_estado_el = f"<span style='color:#60a5fa; font-weight:700;'>📈 Superávit: +{delta_el:.0f} kcal</span>"
     else:
-        st.sidebar.markdown("**Gramos Diarios (Él):**")
-        c_p_el, c_c_el, c_g_el = st.sidebar.columns(3)
-        with c_p_el:
-            custom_p_el_val = st.number_input("Prot (g)", min_value=10.0, max_value=400.0, value=custom_p_el_val, step=1.0, key="custom_p_el")
-        with c_c_el:
-            custom_c_el_val = st.number_input("Carb (g)", min_value=10.0, max_value=600.0, value=custom_c_el_val, step=1.0, key="custom_c_el")
-        with c_g_el:
-            custom_g_el_val = st.number_input("Grasa (g)", min_value=10.0, max_value=250.0, value=custom_g_el_val, step=1.0, key="custom_g_el")
-        req_p_el = custom_p_el_val
-        req_c_el = custom_c_el_val
-        req_g_el = custom_g_el_val
-        meta_kcal_el = (req_p_el * 4.0) + (req_c_el * 4.0) + (req_g_el * 9.0)
-        custom_kcal_el_val = meta_kcal_el
+        badge_estado_el = "<span style='color:#94a3b8; font-weight:700;'>⚖️ Mantenimiento</span>"
 
-elif "2150" in opcion_act_el:
-    meta_kcal_el = 2150.0
-    req_p_el = 188.0
-    req_c_el = 210.0
-    req_g_el = 60.0
-elif "2400" in opcion_act_el:
-    meta_kcal_el = 2400.0
-    req_p_el = 200.0
-    req_c_el = 240.0
-    req_g_el = 70.0
-elif "Mantenimiento" in opcion_act_el:
-    meta_kcal_el = float(round(tdee_prom_el))
-    req_p_el = round((meta_kcal_el * 0.30) / 4.0)
-    req_c_el = round((meta_kcal_el * 0.45) / 4.0)
-    req_g_el = round((meta_kcal_el * 0.25) / 9.0)
-else: # Superávit
-    meta_kcal_el = float(round(tdee_prom_el + 300.0))
-    req_p_el = round((meta_kcal_el * 0.30) / 4.0)
-    req_c_el = round((meta_kcal_el * 0.45) / 4.0)
-    req_g_el = round((meta_kcal_el * 0.25) / 9.0)
-
-# Indicador de estado calórico (Él)
-delta_el = meta_kcal_el - tdee_prom_el
-if delta_el <= -15:
-    badge_estado_el = f"<span style='color:#10b981; font-weight:700;'>📉 Déficit: {delta_el:.0f} kcal</span>"
-elif delta_el >= 15:
-    badge_estado_el = f"<span style='color:#60a5fa; font-weight:700;'>📈 Superávit: +{delta_el:.0f} kcal</span>"
-else:
-    badge_estado_el = "<span style='color:#94a3b8; font-weight:700;'>⚖️ Mantenimiento</span>"
-
-st.sidebar.markdown(
-    f"<span class='badge-kcal'>Meta: {meta_kcal_el:.0f} kcal</span> {badge_estado_el}<br>"
-    f"<span class='badge-p'>{req_p_el:.0f}g P</span> "
-    f"<span class='badge-c'>{req_c_el:.0f}g C</span> "
-    f"<span class='badge-g'>{req_g_el:.0f}g G</span>",
-    unsafe_allow_html=True
-)
-
-st.sidebar.markdown("---")
-
-# --- OBJETIVO & META CALÓRICA: ELLA ---
-st.sidebar.markdown("### 🎯 Objetivo & Meta Calórica (Ella)")
-lista_act_ella = [
-    "📉 Déficit Moderado (Base 1300 kcal)",
-    "📉 Déficit Ligero (Base 1500 kcal)",
-    "⚖️ Mantenimiento Metabólico (TDEE)",
-    "📈 Superávit (+250 kcal Ganancia / Volumen)",
-    "🛠️ Personalizada (Ajustar a mano kcal o macros)"
-]
-idx_act_ella = lista_act_ella.index(cfg_usuario.get("opcion_act_ella")) if cfg_usuario.get("opcion_act_ella") in lista_act_ella else 0
-opcion_act_ella = st.sidebar.selectbox("Meta Nutricional (Ella)", lista_act_ella, index=idx_act_ella, key="sel_act_ella")
-
-# Variables personalizadas Ella para persistencia
-custom_kcal_ella_val = float(cfg_usuario.get("custom_kcal_ella", 1300.0))
-custom_p_ella_val = float(cfg_usuario.get("custom_p_ella", 115.0))
-custom_c_ella_val = float(cfg_usuario.get("custom_c_ella", 120.0))
-custom_g_ella_val = float(cfg_usuario.get("custom_g_ella", 38.0))
-modo_pers_ella_val = str(cfg_usuario.get("modo_pers_ella", "Calorías Totales Directas (kcal)"))
-
-if "Personalizada" in opcion_act_ella:
-    st.sidebar.markdown("""
-    <div style="background: rgba(236, 72, 153, 0.12); border: 1px solid rgba(236, 72, 153, 0.35); border-radius: 8px; padding: 10px; margin-top: 6px; margin-bottom: 10px;">
-        <strong style="color: #f472b6; font-size: 0.9rem;">🛠️ Panel Personalizado (Ella)</strong><br>
-        <span style="font-size: 0.78rem; color: #cbd5e1;">Ajusta tus calorías o tus gramos de macros libremente:</span>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    modo_pers_ella_val = st.sidebar.radio(
-        "Ajustar por (Ella):",
-        ["Gramos de Macronutrientes (P, C, G)", "Calorías Totales Directas (kcal)"],
-        index=0 if modo_pers_ella_val == "Gramos de Macronutrientes (P, C, G)" else 1,
-        key="modo_pers_ella"
+    st.markdown(
+        f"<span class='badge-kcal'>Meta: {meta_kcal_el:.0f} kcal</span> {badge_estado_el}<br>"
+        f"<span class='badge-p'>{req_p_el:.0f}g P</span> "
+        f"<span class='badge-c'>{req_c_el:.0f}g C</span> "
+        f"<span class='badge-g'>{req_g_el:.0f}g G</span>",
+        unsafe_allow_html=True
     )
-    
-    if modo_pers_ella_val == "Calorías Totales Directas (kcal)":
-        custom_kcal_ella_val = st.sidebar.number_input(
-            "Calorías Diarias Asignadas (Ella)",
-            min_value=800.0, max_value=4000.0, value=custom_kcal_ella_val, step=25.0,
-            key="custom_kcal_ella",
-            help="Presupuesto calórico diario que te asignó tu plan o nutricionista."
+
+with tab_sb_ella:
+    st.markdown("---")
+    st.markdown("### 🎯 Objetivo & Meta Calórica (Ella)")
+    lista_act_ella = [
+        "📉 Déficit Moderado (Base 1300 kcal)",
+        "📉 Déficit Ligero (Base 1500 kcal)",
+        "⚖️ Mantenimiento Metabólico (TDEE)",
+        "📈 Superávit (+250 kcal Ganancia / Volumen)",
+        "🛠️ Personalizada (Ajustar a mano kcal o macros)"
+    ]
+    idx_act_ella = lista_act_ella.index(cfg_usuario.get("opcion_act_ella")) if cfg_usuario.get("opcion_act_ella") in lista_act_ella else 0
+    opcion_act_ella = st.selectbox("Meta Nutricional (Ella)", lista_act_ella, index=idx_act_ella, key="sel_act_ella")
+
+    custom_kcal_ella_val = float(cfg_usuario.get("custom_kcal_ella", 1300.0))
+    custom_p_ella_val = float(cfg_usuario.get("custom_p_ella", 115.0))
+    custom_c_ella_val = float(cfg_usuario.get("custom_c_ella", 120.0))
+    custom_g_ella_val = float(cfg_usuario.get("custom_g_ella", 38.0))
+    modo_pers_ella_val = str(cfg_usuario.get("modo_pers_ella", "Calorías Totales Directas (kcal)"))
+
+    if "Personalizada" in opcion_act_ella:
+        st.markdown("""
+        <div style="background: rgba(236, 72, 153, 0.12); border: 1px solid rgba(236, 72, 153, 0.35); border-radius: 8px; padding: 10px; margin-top: 6px; margin-bottom: 10px;">
+            <strong style="color: #f472b6; font-size: 0.9rem;">🛠️ Panel Personalizado (Ella)</strong><br>
+            <span style="font-size: 0.78rem; color: #cbd5e1;">Ajusta tus calorías o tus gramos de macros libremente:</span>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        modo_pers_ella_val = st.radio(
+            "Ajustar por (Ella):",
+            ["Gramos de Macronutrientes (P, C, G)", "Calorías Totales Directas (kcal)"],
+            index=0 if modo_pers_ella_val == "Gramos de Macronutrientes (P, C, G)" else 1,
+            key="modo_pers_ella"
         )
-        meta_kcal_ella = custom_kcal_ella_val
-        req_p_ella = round((meta_kcal_ella * 0.35) / 4.0)
-        req_c_ella = round((meta_kcal_ella * 0.38) / 4.0)
-        req_g_ella = round((meta_kcal_ella * 0.27) / 9.0)
-        st.sidebar.caption(f"Distribución sugerida (35% P, 38% C, 27% G): **{req_p_ella:.0f}g P | {req_c_ella:.0f}g C | {req_g_ella:.0f}g G**")
+        
+        if modo_pers_ella_val == "Calorías Totales Directas (kcal)":
+            custom_kcal_ella_val = st.number_input(
+                "Calorías Diarias Asignadas (Ella)",
+                min_value=800.0, max_value=4000.0, value=custom_kcal_ella_val, step=25.0,
+                key="custom_kcal_ella",
+                help="Presupuesto calórico diario que te asignó tu plan o nutricionista."
+            )
+            meta_kcal_ella = custom_kcal_ella_val
+            req_p_ella = round((meta_kcal_ella * 0.35) / 4.0)
+            req_c_ella = round((meta_kcal_ella * 0.38) / 4.0)
+            req_g_ella = round((meta_kcal_ella * 0.27) / 9.0)
+            st.caption(f"Distribución sugerida (35% P, 38% C, 27% G): **{req_p_ella:.0f}g P | {req_c_ella:.0f}g C | {req_g_ella:.0f}g G**")
+        else:
+            st.markdown("**Gramos Diarios (Ella):**")
+            c_p_ella, c_c_ella, c_g_ella = st.columns(3)
+            with c_p_ella:
+                custom_p_ella_val = st.number_input("Prot (g)", min_value=10.0, max_value=300.0, value=custom_p_ella_val, step=1.0, key="custom_p_ella")
+            with c_c_ella:
+                custom_c_ella_val = st.number_input("Carb (g)", min_value=10.0, max_value=400.0, value=custom_c_ella_val, step=1.0, key="custom_c_ella")
+            with c_g_ella:
+                custom_g_ella_val = st.number_input("Grasa (g)", min_value=10.0, max_value=200.0, value=custom_g_ella_val, step=1.0, key="custom_g_ella")
+            req_p_ella = custom_p_ella_val
+            req_c_ella = custom_c_ella_val
+            req_g_ella = custom_g_ella_val
+            meta_kcal_ella = (req_p_ella * 4.0) + (req_c_ella * 4.0) + (req_g_ella * 9.0)
+            custom_kcal_ella_val = meta_kcal_ella
+
+    elif "1300" in opcion_act_ella:
+        meta_kcal_ella = 1300.0
+        req_p_ella = 115.0
+        req_c_ella = 120.0
+        req_g_ella = 38.0
+    elif "1500" in opcion_act_ella:
+        meta_kcal_ella = 1500.0
+        req_p_ella = 125.0
+        req_c_ella = 150.0
+        req_g_ella = 45.0
+    elif "Mantenimiento" in opcion_act_ella:
+        meta_kcal_ella = float(round(tdee_prom_ella))
+        req_p_ella = round((meta_kcal_ella * 0.30) / 4.0)
+        req_c_ella = round((meta_kcal_ella * 0.45) / 4.0)
+        req_g_el_ella = round((meta_kcal_ella * 0.25) / 9.0)
+        req_g_ella = req_g_el_ella
+    else: # Superávit
+        meta_kcal_ella = float(round(tdee_prom_ella + 250.0))
+        req_p_ella = round((meta_kcal_ella * 0.30) / 4.0)
+        req_c_ella = round((meta_kcal_ella * 0.45) / 4.0)
+        req_g_ella = round((meta_kcal_ella * 0.25) / 9.0)
+
+    # Indicador de estado calórico (Ella)
+    delta_ella = meta_kcal_ella - tdee_prom_ella
+    if delta_ella <= -15:
+        badge_estado_ella = f"<span style='color:#10b981; font-weight:700;'>📉 Déficit: {delta_ella:.0f} kcal</span>"
+    elif delta_ella >= 15:
+        badge_estado_ella = f"<span style='color:#ec4899; font-weight:700;'>📈 Superávit: +{delta_ella:.0f} kcal</span>"
     else:
-        st.sidebar.markdown("**Gramos Diarios (Ella):**")
-        c_p_ella, c_c_ella, c_g_ella = st.sidebar.columns(3)
-        with c_p_ella:
-            custom_p_ella_val = st.number_input("Prot (g)", min_value=10.0, max_value=300.0, value=custom_p_ella_val, step=1.0, key="custom_p_ella")
-        with c_c_ella:
-            custom_c_ella_val = st.number_input("Carb (g)", min_value=10.0, max_value=400.0, value=custom_c_ella_val, step=1.0, key="custom_c_ella")
-        with c_g_ella:
-            custom_g_ella_val = st.number_input("Grasa (g)", min_value=10.0, max_value=200.0, value=custom_g_ella_val, step=1.0, key="custom_g_ella")
-        req_p_ella = custom_p_ella_val
-        req_c_ella = custom_c_ella_val
-        req_g_ella = custom_g_ella_val
-        meta_kcal_ella = (req_p_ella * 4.0) + (req_c_ella * 4.0) + (req_g_ella * 9.0)
-        custom_kcal_ella_val = meta_kcal_ella
+        badge_estado_ella = "<span style='color:#94a3b8; font-weight:700;'>⚖️ Mantenimiento</span>"
 
-elif "1300" in opcion_act_ella:
-    meta_kcal_ella = 1300.0
-    req_p_ella = 115.0
-    req_c_ella = 120.0
-    req_g_ella = 38.0
-elif "1500" in opcion_act_ella:
-    meta_kcal_ella = 1500.0
-    req_p_ella = 125.0
-    req_c_ella = 150.0
-    req_g_ella = 45.0
-elif "Mantenimiento" in opcion_act_ella:
-    meta_kcal_ella = float(round(tdee_prom_ella))
-    req_p_ella = round((meta_kcal_ella * 0.30) / 4.0)
-    req_c_ella = round((meta_kcal_ella * 0.45) / 4.0)
-    req_g_el_ella = round((meta_kcal_ella * 0.25) / 9.0)
-    req_g_ella = req_g_el_ella
-else: # Superávit
-    meta_kcal_ella = float(round(tdee_prom_ella + 250.0))
-    req_p_ella = round((meta_kcal_ella * 0.30) / 4.0)
-    req_c_ella = round((meta_kcal_ella * 0.45) / 4.0)
-    req_g_ella = round((meta_kcal_ella * 0.25) / 9.0)
-
-# Indicador de estado calórico (Ella)
-delta_ella = meta_kcal_ella - tdee_prom_ella
-if delta_ella <= -15:
-    badge_estado_ella = f"<span style='color:#10b981; font-weight:700;'>📉 Déficit: {delta_ella:.0f} kcal</span>"
-elif delta_ella >= 15:
-    badge_estado_ella = f"<span style='color:#ec4899; font-weight:700;'>📈 Superávit: +{delta_ella:.0f} kcal</span>"
-else:
-    badge_estado_ella = "<span style='color:#94a3b8; font-weight:700;'>⚖️ Mantenimiento</span>"
-
-st.sidebar.markdown(
-    f"<span class='badge-kcal'>Meta: {meta_kcal_ella:.0f} kcal</span> {badge_estado_ella}<br>"
-    f"<span class='badge-p'>{req_p_ella:.0f}g P</span> "
-    f"<span class='badge-c'>{req_c_ella:.0f}g C</span> "
-    f"<span class='badge-g'>{req_g_ella:.0f}g G</span>",
-    unsafe_allow_html=True
-)
-
-st.sidebar.markdown("---")
-
-# --- REPARTO DEL PLATO COMPARTIDO ---
-lista_reparto = ["Dinámica según Metas Calóricas", "Fija Estándar (60% Él / 40% Ella)"]
-idx_reparto = lista_reparto.index(cfg_usuario.get("tipo_reparto")) if cfg_usuario.get("tipo_reparto") in lista_reparto else 0
-tipo_reparto = st.sidebar.radio("Proporción de Olla Compartida", lista_reparto, index=idx_reparto)
+    st.markdown(
+        f"<span class='badge-kcal'>Meta: {meta_kcal_ella:.0f} kcal</span> {badge_estado_ella}<br>"
+        f"<span class='badge-p'>{req_p_ella:.0f}g P</span> "
+        f"<span class='badge-c'>{req_c_ella:.0f}g C</span> "
+        f"<span class='badge-g'>{req_g_ella:.0f}g G</span>",
+        unsafe_allow_html=True
+    )
 
 # Guardar automáticamente la configuración si cambió para que nunca se pierda al refrescar
 cfg_actual = {
@@ -995,7 +979,16 @@ with tab1:
                     st.rerun()
 
     st.markdown("---")
-    st.markdown("##### ➕ Agregar Ingrediente a la Olla Actual")
+    st.markdown("""
+    <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(30,41,59,0.5); padding:10px 18px; border-radius:10px; border:1px solid rgba(255,255,255,0.08); margin-bottom:14px; flex-wrap:wrap; gap:8px;">
+        <div style="font-size:0.85rem; font-weight:700; color:#38bdf8;">PASO 1: 🥩 Ingredientes en Crudo</div>
+        <div style="color:#64748b;">➜</div>
+        <div style="font-size:0.85rem; font-weight:700; color:#cbd5e1;">PASO 2: ⚖️ Pesar Olla Cocida</div>
+        <div style="color:#64748b;">➜</div>
+        <div style="font-size:0.85rem; font-weight:700; color:#10b981;">PASO 3: 🍽️ Servir en Balanza</div>
+    </div>
+    """, unsafe_allow_html=True)
+    st.markdown("##### ➕ PASO 1: Agregar Ingrediente a la Olla Actual (en crudo)")
     col_add1, col_add2, col_add3, col_add4 = st.columns([2.5, 1.2, 1.8, 1.2])
     with col_add1:
         ing_nombre = st.selectbox("Ingrediente para la Olla", nombres_alimentos, key="add_ing_nombre")
@@ -1153,7 +1146,7 @@ with tab1:
 
         st.markdown("---")
         # DIVISOR DE PLATO COCIDO (60/40 O PROPORCIÓN METABÓLICA)
-        st.markdown("### ⚖️ Divisor de Plato Cocido en Balanza")
+        st.markdown("### ⚖️ PASO 2 & 3: Pesar Olla Cocida y Servir en Balanza")
         st.markdown(
             "Al cocinar, los alimentos pierden agua (carnes, vegetales) o la absorben (arroz, pasta). "
             "Pesa toda la preparación cocida junta y la balanza te dirá cuántos gramos servir exactamente en cada plato."
@@ -1359,12 +1352,59 @@ with tab_sem:
                 st.success(f"¡Agregado {rap_gr:.0f}g de {rap_ali} a {rap_dia}!")
                 st.rerun()
 
+    # Mini-Dashboard Tira Semanal de 7 Días (Visión general instantánea)
+    st.markdown("#### 🧭 Ritmo Metabólico Semanal (7 Días)")
+    tira_cols = st.columns(7)
+    for idx_td, d_nom in enumerate(DIAS_SEMANA):
+        com_d = st.session_state.semana_alimentos.get(d_nom, [])
+        act_d = st.session_state.semana_caminatas.get(d_nom, {})
+        cons_el_d = sum(c.get("el_kcal", 0.0) for c in com_d)
+        quem_el_d = sum(float(a.get("kcal", 0.0)) for a in act_d.get("actividades_el", []))
+        gasto_d_el = sed_el + quem_el_d
+        net_el_d = gasto_d_el - cons_el_d  # positivo = deficit
+
+        cons_ella_d = sum(c.get("ella_kcal", 0.0) for c in com_d)
+        quem_ella_d = sum(float(a.get("kcal", 0.0)) for a in act_d.get("actividades_ella", []))
+        gasto_d_ella = sed_ella + quem_ella_d
+        net_ella_d = gasto_d_ella - cons_ella_d
+
+        with tira_cols[idx_td]:
+            if cons_el_d == 0 and quem_el_d == 0:
+                bg_chip = "rgba(100, 116, 139, 0.15)"
+                border_chip = "rgba(100, 116, 139, 0.3)"
+                txt_el = "<span style='color:#94a3b8;'>⚪ 0 kcal</span>"
+                txt_ella = "<span style='color:#94a3b8;'>⚪ 0 kcal</span>"
+            else:
+                if net_el_d >= 50:
+                    txt_el = f"<span style='color:#10b981; font-weight:700;'>📉 -{net_el_d:.0f}</span>"
+                elif net_el_d <= -50:
+                    txt_el = f"<span style='color:#60a5fa; font-weight:700;'>📈 +{abs(net_el_d):.0f}</span>"
+                else:
+                    txt_el = "<span style='color:#94a3b8;'>⚖️ 0</span>"
+
+                if net_ella_d >= 50:
+                    txt_ella = f"<span style='color:#10b981; font-weight:700;'>📉 -{net_ella_d:.0f}</span>"
+                elif net_ella_d <= -50:
+                    txt_ella = f"<span style='color:#f472b6; font-weight:700;'>📈 +{abs(net_ella_d):.0f}</span>"
+                else:
+                    txt_ella = "<span style='color:#94a3b8;'>⚖️ 0</span>"
+
+                bg_chip = "rgba(30, 41, 59, 0.6)"
+                border_chip = "rgba(255, 255, 255, 0.12)"
+
+            st.markdown(f"""
+            <div style="background: {bg_chip}; border: 1px solid {border_chip}; border-radius: 8px; padding: 6px 2px; text-align: center; margin-bottom: 12px;">
+                <div style="font-weight: 700; font-size: 0.82rem; color: #f8fafc; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 2px; margin-bottom: 4px;">{d_nom[:3]}</div>
+                <div style="font-size: 0.73rem;">👨 {txt_el}</div>
+                <div style="font-size: 0.73rem;">👩 {txt_ella}</div>
+            </div>
+            """, unsafe_allow_html=True)
+
     # Visualización Día por Día
-    st.markdown("#### 📋 Comidas y Actividad Registradas Día por Día")
+    st.markdown("#### 📋 Registro Diario (Comidas & Actividades)")
     tabs_dias = st.tabs(DIAS_SEMANA)
     for i_dia, dia_nom in enumerate(DIAS_SEMANA):
         with tabs_dias[i_dia]:
-            # Registro de actividades de este día específico
             cam_data_dia = st.session_state.semana_caminatas.get(dia_nom, {})
             acts_el = cam_data_dia.get("actividades_el", [])
             acts_ella = cam_data_dia.get("actividades_ella", [])
@@ -1377,228 +1417,254 @@ with tab_sem:
             minutos_dia_ella = sum(int(a.get("minutos", 0)) for a in acts_ella)
             gasto_real_dia_ella = sed_ella + quema_dia_ella
 
+            comidas_dia = st.session_state.semana_alimentos.get(dia_nom, [])
+            tot_dia_el_k = sum(c.get("el_kcal", 0.0) for c in comidas_dia)
+            tot_dia_ella_k = sum(c.get("ella_kcal", 0.0) for c in comidas_dia)
+
+            bal_hoy_el = gasto_real_dia_el - tot_dia_el_k
+            bal_hoy_ella = gasto_real_dia_ella - tot_dia_ella_k
+
+            # Header del Día con Balance en Vivo
+            if bal_hoy_el >= 50:
+                badge_bal_el = f"<span style='color:#10b981; font-weight:700;'>📉 Déficit: -{bal_hoy_el:.0f} kcal</span>"
+            elif bal_hoy_el <= -50:
+                badge_bal_el = f"<span style='color:#60a5fa; font-weight:700;'>📈 Superávit: +{abs(bal_hoy_el):.0f} kcal</span>"
+            else:
+                badge_bal_el = "<span style='color:#94a3b8; font-weight:700;'>⚖️ Equilibrio</span>"
+
+            if bal_hoy_ella >= 50:
+                badge_bal_ella = f"<span style='color:#10b981; font-weight:700;'>📉 Déficit: -{bal_hoy_ella:.0f} kcal</span>"
+            elif bal_hoy_ella <= -50:
+                badge_bal_ella = f"<span style='color:#ec4899; font-weight:700;'>📈 Superávit: +{abs(bal_hoy_ella):.0f} kcal</span>"
+            else:
+                badge_bal_ella = "<span style='color:#94a3b8; font-weight:700;'>⚖️ Equilibrio</span>"
+
             st.markdown(f"""
-            <div style="background: rgba(30, 41, 59, 0.45); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; padding: 12px 16px; margin-bottom: 14px;">
-                <div style="color: #38bdf8; font-weight: 700; font-size: 0.95rem; margin-bottom: 4px;">🏃 Registro de Actividades & Ejercicio de {dia_nom}</div>
-                <span style="font-size: 0.8rem; color: #94a3b8;">Puedes registrar <b>varias actividades en un mismo día</b> (ej. caminata + gimnasio/pesas + bici) o ingresar las <b>calorías quemadas según tu reloj inteligente</b>. El sistema sumará el gasto metabólico total real.</span>
+            <div style="background: rgba(30, 41, 59, 0.55); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; padding: 12px 16px; margin-bottom: 14px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <div>
+                        <strong style="color: #60a5fa; font-size: 0.95rem;">👨 Él:</strong> 
+                        <span style="font-size: 0.88rem; color: #cbd5e1;">Consumo: <b>{tot_dia_el_k:.0f} kcal</b> | Gasto: <b>{gasto_real_dia_el:.0f} kcal</b></span> 
+                        &nbsp;→&nbsp; {badge_bal_el}
+                    </div>
+                    <div>
+                        <strong style="color: #f472b6; font-size: 0.95rem;">👩 Ella:</strong> 
+                        <span style="font-size: 0.88rem; color: #cbd5e1;">Consumo: <b>{tot_dia_ella_k:.0f} kcal</b> | Gasto: <b>{gasto_real_dia_ella:.0f} kcal</b></span> 
+                        &nbsp;→&nbsp; {badge_bal_ella}
+                    </div>
+                </div>
             </div>
             """, unsafe_allow_html=True)
 
-            # Formulario interactivo para registrar actividad en este día
-            with st.expander(f"➕ Registrar nueva actividad en {dia_nom}", expanded=(len(acts_el) == 0 and len(acts_ella) == 0)):
-                cf1, cf2, cf3 = st.columns([1.5, 2.5, 2.0])
-                with cf1:
-                    dest_act = st.selectbox("¿Quién la realizó?", ["👨 Solo Él", "👩 Solo Ella", "👫 Ambos (Juntos)"], key=f"dest_act_{dia_nom}")
-                with cf2:
-                    tipo_act_sel = st.selectbox("Tipo de Actividad", list(CATALOGO_ACTIVIDADES.keys()), key=f"tipo_act_{dia_nom}")
-                    act_info = CATALOGO_ACTIVIDADES[tipo_act_sel]
-                with cf3:
-                    modo_calc = st.radio("Método de Registro:", ["⏱️ Por Minutos (Fórmula METs)", "⌚ Por Calorías del Reloj (kcal directas)"], key=f"modo_calc_{dia_nom}")
+            # Master 2-Column Layout
+            col_dia_izq, col_dia_der = st.columns([1.1, 0.9])
 
-                nombre_final = act_info["nombre"]
-                icono_final = act_info["icono"]
-                mets_act = act_info["mets"]
+            # ==============================================================
+            # COLUMNA IZQUIERDA: COMIDAS Y NUTRICIÓN
+            # ==============================================================
+            with col_dia_izq:
+                st.markdown(f"##### 🍽️ Comidas de {dia_nom} ({len(comidas_dia)})")
 
-                if "Otra Actividad" in nombre_final:
-                    cf_extra1, cf_extra2 = st.columns([3, 1.5])
-                    with cf_extra1:
-                        nombre_final = st.text_input("Nombre de la Actividad", value="Entrenamiento", key=f"nom_custom_act_{dia_nom}")
-                    with cf_extra2:
-                        mets_act = st.number_input("Intensidad (METs)", min_value=1.0, max_value=16.0, value=4.5, step=0.5, key=f"mets_custom_{dia_nom}")
-
-                if "Minutos" in modo_calc:
-                    cm1, cm2 = st.columns([2, 3])
-                    with cm1:
-                        dur_min = st.number_input("Duración (minutos)", min_value=5, max_value=360, value=45, step=5, key=f"min_act_{dia_nom}", help="Ej: 45 min, 60 min, etc.")
-                    with cm2:
-                        quema_prev_el = (mets_act * peso_el * dur_min) / 60.0
-                        quema_prev_ella = (mets_act * peso_ella * dur_min) / 60.0
-                        prev_txt = []
-                        if dest_act in ["👨 Solo Él", "👫 Ambos (Juntos)"]:
-                            prev_txt.append(f"👨 Él: <b>+{quema_prev_el:.0f} kcal</b>")
-                        if dest_act in ["👩 Solo Ella", "👫 Ambos (Juntos)"]:
-                            prev_txt.append(f"👩 Ella: <b>+{quema_prev_ella:.0f} kcal</b>")
-                        st.markdown(f"<div style='font-size:0.8rem; color:#94a3b8; margin-top:24px;'>🔥 Quema estimada: {' | '.join(prev_txt)}</div>", unsafe_allow_html=True)
-                else:
-                    dur_min = st.number_input("Duración aprox. (minutos)", min_value=0, max_value=360, value=45, step=5, key=f"min_reloj_{dia_nom}", help="Opcional para registro de tiempo")
-                    if dest_act == "👨 Solo Él":
-                        kcal_in_el = st.number_input("Calorías activas del Reloj (Él)", min_value=1.0, max_value=4000.0, value=300.0, step=10.0, key=f"kcal_in_el_{dia_nom}")
-                    elif dest_act == "👩 Solo Ella":
-                        kcal_in_ella = st.number_input("Calorías activas del Reloj (Ella)", min_value=1.0, max_value=3000.0, value=200.0, step=10.0, key=f"kcal_in_ella_{dia_nom}")
-                    else:
-                        cr1, cr2 = st.columns(2)
-                        with cr1:
-                            kcal_in_el = st.number_input("Calorías Reloj (Él)", min_value=1.0, max_value=4000.0, value=300.0, step=10.0, key=f"kcal_in_el_ambos_{dia_nom}")
-                        with cr2:
-                            kcal_in_ella = st.number_input("Calorías Reloj (Ella)", min_value=1.0, max_value=3000.0, value=200.0, step=10.0, key=f"kcal_in_ella_ambos_{dia_nom}")
-
-                if st.button(f"➕ Registrar Actividad en {dia_nom}", key=f"btn_add_act_{dia_nom}", use_container_width=True):
-                    ts_id = datetime.now().strftime("%H%M%S%f")
-                    if dest_act in ["👨 Solo Él", "👫 Ambos (Juntos)"]:
-                        k_calc_el = (mets_act * peso_el * dur_min / 60.0) if "Minutos" in modo_calc else float(kcal_in_el)
-                        st.session_state.semana_caminatas[dia_nom]["actividades_el"].append({
-                            "id": f"el_{ts_id}",
-                            "nombre": nombre_final,
-                            "icono": icono_final,
-                            "minutos": int(dur_min),
-                            "kcal": round(k_calc_el, 1),
-                            "modo": "METs" if "Minutos" in modo_calc else "Reloj"
-                        })
-                    if dest_act in ["👩 Solo Ella", "👫 Ambos (Juntos)"]:
-                        k_calc_ella = (mets_act * peso_ella * dur_min / 60.0) if "Minutos" in modo_calc else float(kcal_in_ella)
-                        st.session_state.semana_caminatas[dia_nom]["actividades_ella"].append({
-                            "id": f"ella_{ts_id}",
-                            "nombre": nombre_final,
-                            "icono": icono_final,
-                            "minutos": int(dur_min),
-                            "kcal": round(k_calc_ella, 1),
-                            "modo": "METs" if "Minutos" in modo_calc else "Reloj"
-                        })
-                    guardar_caminatas_semana(st.session_state.semana_caminatas)
-                    st.success("¡Actividad registrada correctamente!")
-                    st.rerun()
-
-            # Columnas con listado y métricas de actividades del día
-            col_v_el, col_v_ella = st.columns(2)
-
-            with col_v_el:
-                st.markdown("<strong style='color: #60a5fa; font-size: 0.95rem;'>👨 Actividades de Él:</strong>", unsafe_allow_html=True)
-                label_el_act = f"+{quema_dia_el:.0f} kcal ({minutos_dia_el} min, {len(acts_el)} act.)" if quema_dia_el > 0 else "Descanso (0 kcal)"
-                st.metric("Gasto Real Hoy (Él)", f"{gasto_real_dia_el:.0f} kcal", label_el_act)
-
-                if acts_el:
-                    for idx_a, act in enumerate(acts_el):
-                        ca1, ca2, ca3 = st.columns([4.2, 3.8, 0.8])
-                        with ca1:
-                            st.markdown(f"{act.get('icono', '⚡')} **{act.get('nombre', 'Actividad')}**")
-                        with ca2:
-                            st.markdown(f"<span style='color:#38bdf8;'>⏱️ {act.get('minutos', 0)} min &nbsp;|&nbsp; 🔥 <b>{act.get('kcal', 0):.0f} kcal</b> <span style='font-size:0.75rem; color:#94a3b8;'>({act.get('modo', '')})</span></span>", unsafe_allow_html=True)
-                        with ca3:
-                            if st.button("❌", key=f"del_act_el_{dia_nom}_{idx_a}", help="Eliminar esta actividad"):
-                                st.session_state.semana_caminatas[dia_nom]["actividades_el"].pop(idx_a)
-                                guardar_caminatas_semana(st.session_state.semana_caminatas)
-                                st.rerun()
-                else:
-                    st.caption("Día de descanso (sin actividades registradas)")
-
-            with col_v_ella:
-                st.markdown("<strong style='color: #f472b6; font-size: 0.95rem;'>👩 Actividades de Ella:</strong>", unsafe_allow_html=True)
-                label_ella_act = f"+{quema_dia_ella:.0f} kcal ({minutos_dia_ella} min, {len(acts_ella)} act.)" if quema_dia_ella > 0 else "Descanso (0 kcal)"
-                st.metric("Gasto Real Hoy (Ella)", f"{gasto_real_dia_ella:.0f} kcal", label_ella_act)
-
-                if acts_ella:
-                    for idx_a, act in enumerate(acts_ella):
-                        ca1, ca2, ca3 = st.columns([4.2, 3.8, 0.8])
-                        with ca1:
-                            st.markdown(f"{act.get('icono', '⚡')} **{act.get('nombre', 'Actividad')}**")
-                        with ca2:
-                            st.markdown(f"<span style='color:#f472b6;'>⏱️ {act.get('minutos', 0)} min &nbsp;|&nbsp; 🔥 <b>{act.get('kcal', 0):.0f} kcal</b> <span style='font-size:0.75rem; color:#94a3b8;'>({act.get('modo', '')})</span></span>", unsafe_allow_html=True)
-                        with ca3:
-                            if st.button("❌", key=f"del_act_ella_{dia_nom}_{idx_a}", help="Eliminar esta actividad"):
-                                st.session_state.semana_caminatas[dia_nom]["actividades_ella"].pop(idx_a)
-                                guardar_caminatas_semana(st.session_state.semana_caminatas)
-                                st.rerun()
-                else:
-                    st.caption("Día de descanso (sin actividades registradas)")
-
-            st.markdown("---")
-
-            # Comidas de ese día
-            comidas_dia = st.session_state.semana_alimentos.get(dia_nom, [])
-            c_t1, c_t2 = st.columns([3.5, 1.5])
-            with c_t1:
-                st.markdown(f"##### 🍽️ Comidas cargadas en {dia_nom}:")
-                if comidas_dia:
-                    for idx_c, c_item in enumerate(comidas_dia):
-                        row_c1, row_c2, row_c3, row_c4 = st.columns([3.2, 2.5, 2.5, 0.8])
-                        with row_c1:
-                            st.markdown(f"🍽️ **{c_item.get('descripcion', 'Comida')}**")
-                        with row_c2:
-                            st.markdown(f"<span style='color:#60a5fa;'>👨 Él: <b>{c_item.get('el_kcal', 0):.0f} kcal</b> ({c_item.get('el_p', 0):.0f}P {c_item.get('el_c', 0):.0f}C {c_item.get('el_g', 0):.0f}G)</span>", unsafe_allow_html=True)
-                        with row_c3:
-                            st.markdown(f"<span style='color:#f472b6;'>👩 Ella: <b>{c_item.get('ella_kcal', 0):.0f} kcal</b> ({c_item.get('ella_p', 0):.0f}P {c_item.get('ella_c', 0):.0f}C {c_item.get('ella_g', 0):.0f}G)</span>", unsafe_allow_html=True)
-                        with row_c4:
-                            if st.button("❌", key=f"del_c_{dia_nom}_{idx_c}", help="Eliminar este alimento"):
-                                st.session_state.semana_alimentos[dia_nom].pop(idx_c)
-                                guardar_semana_alimentos(st.session_state.semana_alimentos)
-                                st.rerun()
-                else:
-                    st.info(f"No hay comidas cargadas para el {dia_nom}. Puedes cargarlas arriba o con el formulario rápido de abajo.")
-
-                # Cargador rápido dentro del mismo día
-                with st.expander(f"➕ Agregar alimento directo a {dia_nom}", expanded=False):
-                    cd_a1, cd_a2, cd_a3, cd_a4 = st.columns([2.5, 1.2, 1.5, 1.0])
+                with st.expander(f"➕ Cargar Alimento / Snack a {dia_nom}", expanded=(len(comidas_dia) == 0)):
+                    cd_a1, cd_a2 = st.columns([2.5, 1.2])
                     with cd_a1:
                         ali_rap_dia = st.selectbox("Alimento", sorted(df_alimentos["nombre"].unique()), key=f"ali_rap_{dia_nom}")
                     with cd_a2:
                         gr_rap_dia = st.number_input("Gramos", min_value=1.0, max_value=2500.0, value=100.0, step=10.0, key=f"gr_rap_{dia_nom}")
+
+                    cd_a3, cd_a4 = st.columns([2, 1.2])
                     with cd_a3:
-                        qui_rap_dia = st.selectbox("Para:", ["Solo Él", "Solo Ella", "Ambos (Olla)"], key=f"qui_rap_{dia_nom}")
+                        qui_rap_dia = st.selectbox("Asignar a:", ["Solo Él", "Solo Ella", "Ambos (Olla)"], key=f"qui_rap_{dia_nom}")
                     with cd_a4:
                         st.write("")
                         st.write("")
-                        if st.button("➕ Cargar", key=f"btn_add_rap_{dia_nom}"):
-                            row_rd = df_alimentos[df_alimentos["nombre"] == ali_rap_dia].iloc[0]
-                            f_rd = gr_rap_dia / 100.0
-                            k_rd = row_rd["kcal"] * f_rd
-                            p_rd = row_rd["p"] * f_rd
-                            c_rd = row_rd["c"] * f_rd
-                            g_rd = row_rd["g"] * f_rd
-                            if qui_rap_dia == "Solo Él":
-                                el_k, el_p, el_c, el_g = k_rd, p_rd, c_rd, g_rd
-                                ella_k, ella_p, ella_c, ella_g = 0.0, 0.0, 0.0, 0.0
-                            elif qui_rap_dia == "Solo Ella":
-                                el_k, el_p, el_c, el_g = 0.0, 0.0, 0.0, 0.0
-                                ella_k, ella_p, ella_c, ella_g = k_rd, p_rd, c_rd, g_rd
-                            else:
-                                el_k, el_p, el_c, el_g = k_rd * prop_el, p_rd * prop_el, c_rd * prop_el, g_rd * prop_el
-                                ella_k, ella_p, ella_c, ella_g = k_rd * prop_ella, p_rd * prop_ella, c_rd * prop_ella, g_rd * prop_ella
-                            st.session_state.semana_alimentos[dia_nom].append({
-                                "id": len(st.session_state.semana_alimentos[dia_nom]) + 1,
-                                "descripcion": f"{gr_rap_dia:.0f}g {ali_rap_dia}",
-                                "el_kcal": round(el_k, 1), "el_p": round(el_p, 1), "el_c": round(el_c, 1), "el_g": round(el_g, 1),
-                                "ella_kcal": round(ella_k, 1), "ella_p": round(ella_p, 1), "ella_c": round(ella_c, 1), "ella_g": round(ella_g, 1)
+                        btn_c_rap = st.button("➕ Cargar", key=f"btn_add_rap_{dia_nom}", use_container_width=True)
+
+                    if btn_c_rap:
+                        row_rd = df_alimentos[df_alimentos["nombre"] == ali_rap_dia].iloc[0]
+                        f_rd = gr_rap_dia / 100.0
+                        k_rd = row_rd["kcal"] * f_rd
+                        p_rd = row_rd["p"] * f_rd
+                        c_rd = row_rd["c"] * f_rd
+                        g_rd = row_rd["g"] * f_rd
+                        if qui_rap_dia == "Solo Él":
+                            el_k, el_p, el_c, el_g = k_rd, p_rd, c_rd, g_rd
+                            ella_k, ella_p, ella_c, ella_g = 0.0, 0.0, 0.0, 0.0
+                        elif qui_rap_dia == "Solo Ella":
+                            el_k, el_p, el_c, el_g = 0.0, 0.0, 0.0, 0.0
+                            ella_k, ella_p, ella_c, ella_g = k_rd, p_rd, c_rd, g_rd
+                        else:
+                            el_k, el_p, el_c, el_g = k_rd * prop_el, p_rd * prop_el, c_rd * prop_el, g_rd * prop_el
+                            ella_k, ella_p, ella_c, ella_g = k_rd * prop_ella, p_rd * prop_ella, c_rd * prop_ella, g_rd * prop_ella
+                        st.session_state.semana_alimentos[dia_nom].append({
+                            "id": len(st.session_state.semana_alimentos[dia_nom]) + 1,
+                            "descripcion": f"{gr_rap_dia:.0f}g {ali_rap_dia}",
+                            "el_kcal": round(el_k, 1), "el_p": round(el_p, 1), "el_c": round(el_c, 1), "el_g": round(el_g, 1),
+                            "ella_kcal": round(ella_k, 1), "ella_p": round(ella_p, 1), "ella_c": round(ella_c, 1), "ella_g": round(ella_g, 1)
+                        })
+                        guardar_semana_alimentos(st.session_state.semana_alimentos)
+                        st.rerun()
+
+                # Lista de comidas cargadas hoy
+                if comidas_dia:
+                    for idx_c, c_item in enumerate(comidas_dia):
+                        row_c1, row_c2, row_c3 = st.columns([4.2, 4.0, 0.8])
+                        with row_c1:
+                            st.markdown(f"🍽️ **{c_item.get('descripcion', 'Comida')}**")
+                        with row_c2:
+                            txt_el_p = f"<span style='color:#60a5fa; font-size:0.82rem;'>👨 <b>{c_item.get('el_kcal', 0):.0f}k</b></span>" if c_item.get('el_kcal', 0) > 0 else ""
+                            txt_ella_p = f"<span style='color:#f472b6; font-size:0.82rem;'>👩 <b>{c_item.get('ella_kcal', 0):.0f}k</b></span>" if c_item.get('ella_kcal', 0) > 0 else ""
+                            sep = " | " if (txt_el_p and txt_ella_p) else ""
+                            st.markdown(f"{txt_el_p}{sep}{txt_ella_p}", unsafe_allow_html=True)
+                        with row_c3:
+                            if st.button("❌", key=f"del_c_{dia_nom}_{idx_c}", help="Eliminar comida"):
+                                st.session_state.semana_alimentos[dia_nom].pop(idx_c)
+                                guardar_semana_alimentos(st.session_state.semana_alimentos)
+                                st.rerun()
+
+                    if st.button(f"🗑️ Vaciar comidas de {dia_nom}", key=f"btn_vaciar_{dia_nom}"):
+                        st.session_state.semana_alimentos[dia_nom] = []
+                        guardar_semana_alimentos(st.session_state.semana_alimentos)
+                        st.rerun()
+                else:
+                    st.caption("No hay comidas registradas para este día aún.")
+
+            # ==============================================================
+            # COLUMNA DERECHA: ACTIVIDADES & RELOJ INTELIGENTE
+            # ==============================================================
+            with col_dia_der:
+                st.markdown(f"##### 🏃 Ejercicio & Reloj ({len(acts_el) + len(acts_ella)} activ.)")
+
+                # Botonera de Chips de Acceso Rápido (1 Clic)
+                with st.container():
+                    st.markdown("<span style='font-size:0.75rem; color:#38bdf8; font-weight:700;'>⚡ REGISTRO RÁPIDO (1 CLIC):</span>", unsafe_allow_html=True)
+                    chip_dest = st.selectbox("Para:", ["👨 Solo Él", "👩 Solo Ella", "👫 Ambos (Juntos)"], key=f"chip_dest_{dia_nom}", label_visibility="collapsed")
+                    ch1, ch2, ch3 = st.columns(3)
+
+                    def registrar_quick_act(nom, ico, min_val, mets_v):
+                        ts = datetime.now().strftime("%H%M%S%f")
+                        if chip_dest in ["👨 Solo Él", "👫 Ambos (Juntos)"]:
+                            k_el = round((mets_v * peso_el * min_val) / 60.0, 1)
+                            st.session_state.semana_caminatas[dia_nom]["actividades_el"].append({
+                                "id": f"el_{ts}", "nombre": nom, "icono": ico, "minutos": min_val, "kcal": k_el, "modo": "METs"
                             })
-                            guardar_semana_alimentos(st.session_state.semana_alimentos)
-                            st.rerun()
+                        if chip_dest in ["👩 Solo Ella", "👫 Ambos (Juntos)"]:
+                            k_ella = round((mets_v * peso_ella * min_val) / 60.0, 1)
+                            st.session_state.semana_caminatas[dia_nom]["actividades_ella"].append({
+                                "id": f"ella_{ts}", "nombre": nom, "icono": ico, "minutos": min_val, "kcal": k_ella, "modo": "METs"
+                            })
+                        guardar_caminatas_semana(st.session_state.semana_caminatas)
+                        st.rerun()
 
-            with c_t2:
-                tot_dia_el_k = sum(c["el_kcal"] for c in comidas_dia)
-                tot_dia_ella_k = sum(c["ella_kcal"] for c in comidas_dia)
+                    with ch1:
+                        if st.button("🚶 30m Paseo", key=f"chip_p30_{dia_nom}", help="Caminata constante 30 min (4.0 METs)", use_container_width=True):
+                            registrar_quick_act("Caminata Paseo", "🚶", 30, 4.0)
+                    with ch2:
+                        if st.button("🚶‍♂️ 1h Caminata", key=f"chip_c60_{dia_nom}", help="Caminata rápida 60 min (4.8 METs)", use_container_width=True):
+                            registrar_quick_act("Caminata Rápida", "🚶‍♂️", 60, 4.8)
+                    with ch3:
+                        if st.button("🏋️ 1h Gimnasio", key=f"chip_g60_{dia_nom}", help="Musculación / Pesas 60 min (4.5 METs)", use_container_width=True):
+                            registrar_quick_act("Musculación / Pesas", "🏋️", 60, 4.5)
 
-                st.markdown(f"**Resumen Real de {dia_nom}:**")
-                
-                # Balance de Él hoy
-                bal_hoy_el = gasto_real_dia_el - tot_dia_el_k
-                st.markdown("**👨 Él:**")
-                st.write(f"Consumo: **{tot_dia_el_k:.0f} kcal**")
-                st.write(f"Gasto real: **{gasto_real_dia_el:.0f} kcal**")
-                if bal_hoy_el >= 50:
-                    st.markdown(f"<span style='color:#10b981; font-weight:700;'>📉 Déficit hoy: -{bal_hoy_el:.0f} kcal</span>", unsafe_allow_html=True)
-                elif bal_hoy_el <= -50:
-                    st.markdown(f"<span style='color:#60a5fa; font-weight:700;'>📈 Superávit hoy: +{abs(bal_hoy_el):.0f} kcal</span>", unsafe_allow_html=True)
+                # Formulario Detallado o Reloj Inteligente
+                with st.expander(f"➕ Registro detallado o calorías de Reloj", expanded=False):
+                    cf1, cf2 = st.columns([1.5, 2.0])
+                    with cf1:
+                        dest_act = st.selectbox("¿Quién?", ["👨 Solo Él", "👩 Solo Ella", "👫 Ambos (Juntos)"], key=f"dest_act_{dia_nom}")
+                    with cf2:
+                        modo_calc = st.radio("Método:", ["⏱️ Minutos (METs)", "⌚ Reloj (kcal)"], key=f"modo_calc_{dia_nom}", horizontal=True)
+
+                    tipo_act_sel = st.selectbox("Actividad", list(CATALOGO_ACTIVIDADES.keys()), key=f"tipo_act_{dia_nom}")
+                    act_info = CATALOGO_ACTIVIDADES[tipo_act_sel]
+                    nombre_final = act_info["nombre"]
+                    icono_final = act_info["icono"]
+                    mets_act = act_info["mets"]
+
+                    if "Otra Actividad" in nombre_final:
+                        nombre_final = st.text_input("Nombre de la Actividad", value="Entrenamiento", key=f"nom_custom_act_{dia_nom}")
+                        mets_act = st.number_input("Intensidad (METs)", min_value=1.0, max_value=16.0, value=4.5, step=0.5, key=f"mets_custom_{dia_nom}")
+
+                    if "Minutos" in modo_calc:
+                        dur_min = st.number_input("Duración (minutos)", min_value=5, max_value=360, value=45, step=5, key=f"min_act_{dia_nom}")
+                        quema_prev_el = (mets_act * peso_el * dur_min) / 60.0
+                        quema_prev_ella = (mets_act * peso_ella * dur_min) / 60.0
+                        prev_txt = []
+                        if dest_act in ["👨 Solo Él", "👫 Ambos (Juntos)"]:
+                            prev_txt.append(f"👨 Él: +{quema_prev_el:.0f} kcal")
+                        if dest_act in ["👩 Solo Ella", "👫 Ambos (Juntos)"]:
+                            prev_txt.append(f"👩 Ella: +{quema_prev_ella:.0f} kcal")
+                        st.caption(f"🔥 Quema: {' | '.join(prev_txt)}")
+                    else:
+                        dur_min = st.number_input("Duración aprox. (min)", min_value=0, max_value=360, value=45, step=5, key=f"min_reloj_{dia_nom}")
+                        if dest_act == "👨 Solo Él":
+                            kcal_in_el = st.number_input("Calorías Reloj (Él)", min_value=1.0, max_value=4000.0, value=300.0, step=10.0, key=f"kcal_in_el_{dia_nom}")
+                        elif dest_act == "👩 Solo Ella":
+                            kcal_in_ella = st.number_input("Calorías Reloj (Ella)", min_value=1.0, max_value=3000.0, value=200.0, step=10.0, key=f"kcal_in_ella_{dia_nom}")
+                        else:
+                            cr1, cr2 = st.columns(2)
+                            with cr1:
+                                kcal_in_el = st.number_input("Kcal Él", min_value=1.0, max_value=4000.0, value=300.0, step=10.0, key=f"kcal_in_el_ambos_{dia_nom}")
+                            with cr2:
+                                kcal_in_ella = st.number_input("Kcal Ella", min_value=1.0, max_value=3000.0, value=200.0, step=10.0, key=f"kcal_in_ella_ambos_{dia_nom}")
+
+                    if st.button(f"➕ Guardar Actividad", key=f"btn_add_act_{dia_nom}", use_container_width=True):
+                        ts_id = datetime.now().strftime("%H%M%S%f")
+                        if dest_act in ["👨 Solo Él", "👫 Ambos (Juntos)"]:
+                            k_calc_el = (mets_act * peso_el * dur_min / 60.0) if "Minutos" in modo_calc else float(kcal_in_el)
+                            st.session_state.semana_caminatas[dia_nom]["actividades_el"].append({
+                                "id": f"el_{ts_id}",
+                                "nombre": nombre_final,
+                                "icono": icono_final,
+                                "minutos": int(dur_min),
+                                "kcal": round(k_calc_el, 1),
+                                "modo": "METs" if "Minutos" in modo_calc else "Reloj"
+                            })
+                        if dest_act in ["👩 Solo Ella", "👫 Ambos (Juntos)"]:
+                            k_calc_ella = (mets_act * peso_ella * dur_min / 60.0) if "Minutos" in modo_calc else float(kcal_in_ella)
+                            st.session_state.semana_caminatas[dia_nom]["actividades_ella"].append({
+                                "id": f"ella_{ts_id}",
+                                "nombre": nombre_final,
+                                "icono": icono_final,
+                                "minutos": int(dur_min),
+                                "kcal": round(k_calc_ella, 1),
+                                "modo": "METs" if "Minutos" in modo_calc else "Reloj"
+                            })
+                        guardar_caminatas_semana(st.session_state.semana_caminatas)
+                        st.success("¡Actividad registrada correctamente!")
+                        st.rerun()
+
+                # Lista de Actividades registradas hoy
+                st.markdown("<strong style='color: #60a5fa; font-size: 0.88rem;'>👨 Actividades de Él:</strong>", unsafe_allow_html=True)
+                if acts_el:
+                    for idx_a, act in enumerate(acts_el):
+                        ca1, ca2, ca3 = st.columns([4.0, 4.0, 0.8])
+                        with ca1:
+                            st.markdown(f"{act.get('icono', '⚡')} <span style='font-size:0.85rem;'>{act.get('nombre', 'Actividad')}</span>", unsafe_allow_html=True)
+                        with ca2:
+                            st.markdown(f"<span style='color:#38bdf8; font-size:0.82rem;'>⏱️{act.get('minutos', 0)}m | 🔥<b>{act.get('kcal', 0):.0f}k</b></span>", unsafe_allow_html=True)
+                        with ca3:
+                            if st.button("❌", key=f"del_act_el_{dia_nom}_{idx_a}", help="Eliminar"):
+                                st.session_state.semana_caminatas[dia_nom]["actividades_el"].pop(idx_a)
+                                guardar_caminatas_semana(st.session_state.semana_caminatas)
+                                st.rerun()
                 else:
-                    st.markdown("<span style='color:#94a3b8; font-weight:700;'>⚖️ Equilibrio hoy</span>", unsafe_allow_html=True)
+                    st.caption("Sin actividades registradas (Día de descanso)")
 
-                st.markdown("---")
-
-                # Balance de Ella hoy
-                bal_hoy_ella = gasto_real_dia_ella - tot_dia_ella_k
-                st.markdown("**👩 Ella:**")
-                st.write(f"Consumo: **{tot_dia_ella_k:.0f} kcal**")
-                st.write(f"Gasto real: **{gasto_real_dia_ella:.0f} kcal**")
-                if bal_hoy_ella >= 50:
-                    st.markdown(f"<span style='color:#10b981; font-weight:700;'>📉 Déficit hoy: -{bal_hoy_ella:.0f} kcal</span>", unsafe_allow_html=True)
-                elif bal_hoy_ella <= -50:
-                    st.markdown(f"<span style='color:#ec4899; font-weight:700;'>📈 Superávit hoy: +{abs(bal_hoy_ella):.0f} kcal</span>", unsafe_allow_html=True)
+                st.markdown("<strong style='color: #f472b6; font-size: 0.88rem;'>👩 Actividades de Ella:</strong>", unsafe_allow_html=True)
+                if acts_ella:
+                    for idx_a, act in enumerate(acts_ella):
+                        ca1, ca2, ca3 = st.columns([4.0, 4.0, 0.8])
+                        with ca1:
+                            st.markdown(f"{act.get('icono', '⚡')} <span style='font-size:0.85rem;'>{act.get('nombre', 'Actividad')}</span>", unsafe_allow_html=True)
+                        with ca2:
+                            st.markdown(f"<span style='color:#f472b6; font-size:0.82rem;'>⏱️{act.get('minutos', 0)}m | 🔥<b>{act.get('kcal', 0):.0f}k</b></span>", unsafe_allow_html=True)
+                        with ca3:
+                            if st.button("❌", key=f"del_act_ella_{dia_nom}_{idx_a}", help="Eliminar"):
+                                st.session_state.semana_caminatas[dia_nom]["actividades_ella"].pop(idx_a)
+                                guardar_caminatas_semana(st.session_state.semana_caminatas)
+                                st.rerun()
                 else:
-                    st.markdown("<span style='color:#94a3b8; font-weight:700;'>⚖️ Equilibrio hoy</span>", unsafe_allow_html=True)
-
-                st.markdown("<br>", unsafe_allow_html=True)
-                if comidas_dia and st.button(f"🗑️ Vaciar comidas de {dia_nom}", key=f"btn_vaciar_{dia_nom}", use_container_width=True):
-                    st.session_state.semana_alimentos[dia_nom] = []
-                    guardar_semana_alimentos(st.session_state.semana_alimentos)
-                    st.rerun()
+                    st.caption("Sin actividades registradas (Día de descanso)")
 
     # Totales y Balance Semanal Acumulado
     st.markdown("---")
