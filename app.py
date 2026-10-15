@@ -722,6 +722,84 @@ if cfg_actual != cfg_usuario:
     guardar_config_usuario(cfg_actual)
 
 # ==============================================================================
+# SIDEBAR: BACKUP & RESTAURACIÓN DE DATOS (1 CLIC)
+# ==============================================================================
+st.sidebar.markdown("---")
+with st.sidebar.expander("💾 Copia de Seguridad & Backup"):
+    st.markdown("<span style='font-size:0.82rem; color:#cbd5e1;'>Descarga o restaura tu perfil completo, pesajes históricos, comidas de la semana y recetas en 1 clic.</span>", unsafe_allow_html=True)
+    
+    peso_csv_str = ""
+    if os.path.exists("registro_peso.csv"):
+        try:
+            with open("registro_peso.csv", "r", encoding="utf-8") as f_csv:
+                peso_csv_str = f_csv.read()
+        except Exception:
+            pass
+
+    backup_dict = {
+        "sistema": "NutricionPareja",
+        "version": "2.0",
+        "fecha_exportacion": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "config_usuario": cfg_actual,
+        "alimentos_custom": st.session_state.get("alimentos_custom", []),
+        "recetas_guardadas": st.session_state.get("recetas_guardadas", {}),
+        "semana_alimentos": st.session_state.get("semana_alimentos", {}),
+        "semana_caminatas": st.session_state.get("semana_caminatas", {}),
+        "registro_peso_csv": peso_csv_str
+    }
+    backup_json = json.dumps(backup_dict, ensure_ascii=False, indent=2)
+    
+    st.download_button(
+        label="📥 Descargar Backup (.json)",
+        data=backup_json,
+        file_name=f"backup_nutricion_{date.today().strftime('%Y%m%d')}.json",
+        mime="application/json",
+        use_container_width=True,
+        help="Guarda una copia consolidada en tu computadora para resguardar tus datos."
+    )
+    
+    st.markdown("<hr style='margin: 8px 0; border-color: rgba(255,255,255,0.1);'>", unsafe_allow_html=True)
+    st.markdown("<span style='font-size:0.80rem; font-weight:700; color:#38bdf8;'>📤 Restaurar desde Archivo:</span>", unsafe_allow_html=True)
+    
+    archivo_subido = st.file_uploader("Subir archivo de backup", type=["json"], key="backup_file_uploader", label_visibility="collapsed")
+    if archivo_subido is not None:
+        try:
+            datos_restaurados = json.load(archivo_subido)
+            if not isinstance(datos_restaurados, dict):
+                st.error("El archivo no tiene el formato correcto.")
+            else:
+                fecha_b = datos_restaurados.get("fecha_exportacion", "Desconocida")
+                st.caption(f"📅 Copia del: **{fecha_b}**")
+                if st.button("⚠️ Confirmar y Restaurar Todo", key="btn_confirmar_restaurar", type="primary", use_container_width=True):
+                    if "config_usuario" in datos_restaurados and isinstance(datos_restaurados["config_usuario"], dict):
+                        guardar_config_usuario(datos_restaurados["config_usuario"])
+                    
+                    if "alimentos_custom" in datos_restaurados and isinstance(datos_restaurados["alimentos_custom"], list):
+                        st.session_state.alimentos_custom = datos_restaurados["alimentos_custom"]
+                        guardar_alimentos_custom(datos_restaurados["alimentos_custom"])
+                        
+                    if "recetas_guardadas" in datos_restaurados and isinstance(datos_restaurados["recetas_guardadas"], dict):
+                        st.session_state.recetas_guardadas = datos_restaurados["recetas_guardadas"]
+                        guardar_recetas_guardadas(datos_restaurados["recetas_guardadas"])
+                        
+                    if "semana_alimentos" in datos_restaurados and isinstance(datos_restaurados["semana_alimentos"], dict):
+                        st.session_state.semana_alimentos = datos_restaurados["semana_alimentos"]
+                        guardar_semana_alimentos(datos_restaurados["semana_alimentos"])
+                        
+                    if "semana_caminatas" in datos_restaurados and isinstance(datos_restaurados["semana_caminatas"], dict):
+                        st.session_state.semana_caminatas = datos_restaurados["semana_caminatas"]
+                        guardar_caminatas_semana(datos_restaurados["semana_caminatas"])
+                        
+                    if "registro_peso_csv" in datos_restaurados and datos_restaurados["registro_peso_csv"]:
+                        with open("registro_peso.csv", "w", encoding="utf-8") as f_csv_out:
+                            f_csv_out.write(datos_restaurados["registro_peso_csv"])
+                            
+                    st.success("¡Datos restaurados con éxito! Actualizando...")
+                    st.rerun()
+        except Exception as err_b:
+            st.error(f"Error al procesar archivo: {err_b}")
+
+# ==============================================================================
 # BALANCE ENERGÉTICO & PROPORCIONES DE PLATO
 # ==============================================================================
 # Déficit Diario Neto (positivo = déficit/pérdida de grasa, negativo = superávit/ganancia)
@@ -1614,23 +1692,23 @@ with tab_sem:
                 with st.container():
                     st.markdown("<span style='font-size:0.75rem; color:#38bdf8; font-weight:700;'>⚡ REGISTRO RÁPIDO (1 CLIC):</span>", unsafe_allow_html=True)
                     chip_dest = st.selectbox("Para:", ["👨 Solo Él", "👩 Solo Ella", "👫 Ambos (Juntos)"], key=f"chip_dest_{dia_nom}", label_visibility="collapsed")
-                    ch1, ch2, ch3 = st.columns(3)
-
-                    def registrar_quick_act(nom, ico, min_val, mets_v):
+                    
+                    def registrar_quick_act(nom, ico, min_val, mets_v, modo_v="METs"):
                         ts = datetime.now().strftime("%H%M%S%f")
                         if chip_dest in ["👨 Solo Él", "👫 Ambos (Juntos)"]:
                             k_el = round((mets_v * peso_el * min_val) / 60.0, 1)
                             st.session_state.semana_caminatas[dia_nom]["actividades_el"].append({
-                                "id": f"el_{ts}", "nombre": nom, "icono": ico, "minutos": min_val, "kcal": k_el, "modo": "METs"
+                                "id": f"el_{ts}", "nombre": nom, "icono": ico, "minutos": min_val, "kcal": k_el, "modo": modo_v
                             })
                         if chip_dest in ["👩 Solo Ella", "👫 Ambos (Juntos)"]:
                             k_ella = round((mets_v * peso_ella * min_val) / 60.0, 1)
                             st.session_state.semana_caminatas[dia_nom]["actividades_ella"].append({
-                                "id": f"ella_{ts}", "nombre": nom, "icono": ico, "minutos": min_val, "kcal": k_ella, "modo": "METs"
+                                "id": f"ella_{ts}", "nombre": nom, "icono": ico, "minutos": min_val, "kcal": k_ella, "modo": modo_v
                             })
                         guardar_caminatas_semana(st.session_state.semana_caminatas)
                         st.rerun()
 
+                    ch1, ch2, ch3 = st.columns(3)
                     with ch1:
                         if st.button("🚶 30m Paseo", key=f"chip_p30_{dia_nom}", help="Caminata constante 30 min (4.0 METs)", use_container_width=True):
                             registrar_quick_act("Caminata Paseo", "🚶", 30, 4.0)
@@ -1641,25 +1719,67 @@ with tab_sem:
                         if st.button("🏋️ 1h Gimnasio", key=f"chip_g60_{dia_nom}", help="Musculación / Pesas 60 min (4.5 METs)", use_container_width=True):
                             registrar_quick_act("Musculación / Pesas", "🏋️", 60, 4.5)
 
+                    ch4, ch5, ch6 = st.columns(3)
+                    with ch4:
+                        if st.button("👟 5.000 Pasos", key=f"chip_s5k_{dia_nom}", help="5.000 pasos podómetro (~48 min a 4.0 METs)", use_container_width=True):
+                            registrar_quick_act("5.000 pasos podómetro", "👟", 48, 4.0, modo_v="Pasos")
+                    with ch5:
+                        if st.button("👟 8.000 Pasos", key=f"chip_s8k_{dia_nom}", help="8.000 pasos podómetro (~76 min a 4.0 METs)", use_container_width=True):
+                            registrar_quick_act("8.000 pasos podómetro", "👟", 76, 4.0, modo_v="Pasos")
+                    with ch6:
+                        if st.button("👟 10.000 Pasos", key=f"chip_s10k_{dia_nom}", help="10.000 pasos podómetro (~95 min a 4.0 METs)", use_container_width=True):
+                            registrar_quick_act("10.000 pasos podómetro", "👟", 95, 4.0, modo_v="Pasos")
+
                 # Formulario Detallado o Reloj Inteligente
-                with st.expander(f"➕ Registro detallado o calorías de Reloj", expanded=False):
-                    cf1, cf2 = st.columns([1.5, 2.0])
+                with st.expander(f"➕ Registro detallado, Pasos o Reloj", expanded=False):
+                    cf1, cf2 = st.columns([1.3, 2.2])
                     with cf1:
                         dest_act = st.selectbox("¿Quién?", ["👨 Solo Él", "👩 Solo Ella", "👫 Ambos (Juntos)"], key=f"dest_act_{dia_nom}")
                     with cf2:
-                        modo_calc = st.radio("Método:", ["⏱️ Minutos (METs)", "⌚ Reloj (kcal)"], key=f"modo_calc_{dia_nom}", horizontal=True)
+                        modo_calc = st.radio("Método:", ["⏱️ Minutos (METs)", "👟 Pasos de Celular", "⌚ Reloj (kcal)"], key=f"modo_calc_{dia_nom}", horizontal=True)
 
-                    tipo_act_sel = st.selectbox("Actividad", list(CATALOGO_ACTIVIDADES.keys()), key=f"tipo_act_{dia_nom}")
-                    act_info = CATALOGO_ACTIVIDADES[tipo_act_sel]
-                    nombre_final = act_info["nombre"]
-                    icono_final = act_info["icono"]
-                    mets_act = act_info["mets"]
+                    if "Pasos" in modo_calc:
+                        pasos_in = st.number_input(
+                            "Pasos registrados en el Celular / Podómetro:",
+                            min_value=200,
+                            max_value=60000,
+                            value=7500,
+                            step=500,
+                            key=f"pasos_input_{dia_nom}"
+                        )
+                        # Biomecánica: zancada aproximada según altura
+                        zanc_m_el = (altura_el * 0.415) / 100.0
+                        zanc_m_ella = (altura_ella * 0.413) / 100.0
+                        dist_km_el = (pasos_in * zanc_m_el) / 1000.0
+                        dist_km_ella = (pasos_in * zanc_m_ella) / 1000.0
+                        
+                        # Cadencia promedio: 105 pasos/minuto
+                        dur_min = max(5, int(round(pasos_in / 105.0)))
+                        mets_act = 4.0
+                        quema_prev_el = (mets_act * peso_el * dur_min) / 60.0
+                        quema_prev_ella = (mets_act * peso_ella * dur_min) / 60.0
+                        nombre_final = f"Caminata ({pasos_in:,} pasos)"
+                        icono_final = "👟"
 
-                    if "Otra Actividad" in nombre_final:
-                        nombre_final = st.text_input("Nombre de la Actividad", value="Entrenamiento", key=f"nom_custom_act_{dia_nom}")
-                        mets_act = st.number_input("Intensidad (METs)", min_value=1.0, max_value=16.0, value=4.5, step=0.5, key=f"mets_custom_{dia_nom}")
+                        st.markdown(
+                            f"<div style='background:rgba(56,189,248,0.08); border-left:3px solid #38bdf8; padding:8px 12px; border-radius:6px; font-size:0.83rem; margin-bottom:8px;'>"
+                            f"📏 <b>Distancia calculada:</b> 👨 Él: <b>{dist_km_el:.2f} km</b> | 👩 Ella: <b>{dist_km_ella:.2f} km</b><br>"
+                            f"⏱️ <b>Tiempo activo equivalente:</b> ~{dur_min} min (cadencia 105 pasos/min)<br>"
+                            f"🔥 <b>Gasto Calórico Estimado:</b> 👨 Él: <b>+{quema_prev_el:.0f} kcal</b> | 👩 Ella: <b>+{quema_prev_ella:.0f} kcal</b>"
+                            f"</div>",
+                            unsafe_allow_html=True
+                        )
+                    elif "Minutos" in modo_calc:
+                        tipo_act_sel = st.selectbox("Actividad", list(CATALOGO_ACTIVIDADES.keys()), key=f"tipo_act_{dia_nom}")
+                        act_info = CATALOGO_ACTIVIDADES[tipo_act_sel]
+                        nombre_final = act_info["nombre"]
+                        icono_final = act_info["icono"]
+                        mets_act = act_info["mets"]
 
-                    if "Minutos" in modo_calc:
+                        if "Otra Actividad" in nombre_final:
+                            nombre_final = st.text_input("Nombre de la Actividad", value="Entrenamiento", key=f"nom_custom_act_{dia_nom}")
+                            mets_act = st.number_input("Intensidad (METs)", min_value=1.0, max_value=16.0, value=4.5, step=0.5, key=f"mets_custom_{dia_nom}")
+
                         dur_min = st.number_input("Duración (minutos)", min_value=5, max_value=360, value=45, step=5, key=f"min_act_{dia_nom}")
                         quema_prev_el = (mets_act * peso_el * dur_min) / 60.0
                         quema_prev_ella = (mets_act * peso_ella * dur_min) / 60.0
@@ -1669,7 +1789,12 @@ with tab_sem:
                         if dest_act in ["👩 Solo Ella", "👫 Ambos (Juntos)"]:
                             prev_txt.append(f"👩 Ella: +{quema_prev_ella:.0f} kcal")
                         st.caption(f"🔥 Quema: {' | '.join(prev_txt)}")
-                    else:
+                    else: # Reloj
+                        tipo_act_sel = st.selectbox("Actividad", list(CATALOGO_ACTIVIDADES.keys()), key=f"tipo_act_{dia_nom}")
+                        act_info = CATALOGO_ACTIVIDADES[tipo_act_sel]
+                        nombre_final = act_info["nombre"]
+                        icono_final = act_info["icono"]
+                        mets_act = act_info["mets"]
                         dur_min = st.number_input("Duración aprox. (min)", min_value=0, max_value=360, value=45, step=5, key=f"min_reloj_{dia_nom}")
                         if dest_act == "👨 Solo Él":
                             kcal_in_el = st.number_input("Calorías Reloj (Él)", min_value=1.0, max_value=4000.0, value=300.0, step=10.0, key=f"kcal_in_el_{dia_nom}")
@@ -1684,25 +1809,26 @@ with tab_sem:
 
                     if st.button(f"➕ Guardar Actividad", key=f"btn_add_act_{dia_nom}", use_container_width=True):
                         ts_id = datetime.now().strftime("%H%M%S%f")
+                        modo_guardado = "Pasos" if "Pasos" in modo_calc else ("METs" if "Minutos" in modo_calc else "Reloj")
                         if dest_act in ["👨 Solo Él", "👫 Ambos (Juntos)"]:
-                            k_calc_el = (mets_act * peso_el * dur_min / 60.0) if "Minutos" in modo_calc else float(kcal_in_el)
+                            k_calc_el = (mets_act * peso_el * dur_min / 60.0) if ("Minutos" in modo_calc or "Pasos" in modo_calc) else float(kcal_in_el)
                             st.session_state.semana_caminatas[dia_nom]["actividades_el"].append({
                                 "id": f"el_{ts_id}",
                                 "nombre": nombre_final,
                                 "icono": icono_final,
                                 "minutos": int(dur_min),
                                 "kcal": round(k_calc_el, 1),
-                                "modo": "METs" if "Minutos" in modo_calc else "Reloj"
+                                "modo": modo_guardado
                             })
                         if dest_act in ["👩 Solo Ella", "👫 Ambos (Juntos)"]:
-                            k_calc_ella = (mets_act * peso_ella * dur_min / 60.0) if "Minutos" in modo_calc else float(kcal_in_ella)
+                            k_calc_ella = (mets_act * peso_ella * dur_min / 60.0) if ("Minutos" in modo_calc or "Pasos" in modo_calc) else float(kcal_in_ella)
                             st.session_state.semana_caminatas[dia_nom]["actividades_ella"].append({
                                 "id": f"ella_{ts_id}",
                                 "nombre": nombre_final,
                                 "icono": icono_final,
                                 "minutos": int(dur_min),
                                 "kcal": round(k_calc_ella, 1),
-                                "modo": "METs" if "Minutos" in modo_calc else "Reloj"
+                                "modo": modo_guardado
                             })
                         guardar_caminatas_semana(st.session_state.semana_caminatas)
                         st.success("¡Actividad registrada correctamente!")
