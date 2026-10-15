@@ -1,0 +1,23 @@
+{
+  "peso_el": 119.6,
+  "altura_el": 180,
+  "edad_el": 34,
+  "opcion_act_el": "📉 Déficit Moderado (Base 2150 kcal)",
+  "custom_kcal_el": 2150.0,
+  "custom_p_el": 188.0,
+  "custom_c_el": 210.0,
+  "custom_g_el": 60.0,
+  "modo_pers_el": "Calorías Totales Directas (kcal)",
+  "peso_ella": 69.0,
+  "altura_ella": 150,
+  "edad_ella": 33,
+  "opcion_act_ella": "📉 Déficit Moderado (Base 1300 kcal)",
+  "custom_kcal_ella": 1300.0,
+  "custom_p_ella": 115.0,
+  "custom_c_ella": 120.0,
+  "custom_g_ella": 38.0,
+  "modo_pers_ella": "Calorías Totales Directas (kcal)",
+  "horas_sem": 4.0,
+  "opcion_mets": "4.0 METs - Caminata paso constante/ligero (4.8 - 5.0 km/h)",
+  "tipo_reparto": "Fija Estándar (60% Él / 40% Ella)"
+}
